@@ -13,6 +13,9 @@ import Lenis from 'lenis';
 if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
 gsap.registerPlugin(ScrollTrigger);
 ScrollTrigger.clearScrollMemory('manual');
+// A barra de endereço do celular aparece/some ao rolar e dispara "resize";
+// sem isto, cada um deles recalcula todos os gatilhos no meio da rolagem.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 export const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 export const touch = window.matchMedia('(hover: none), (pointer: coarse)').matches;

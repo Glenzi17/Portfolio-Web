@@ -3,7 +3,7 @@
    projetos, timeline de experiência, nav ativa, contato.
    Rodam dentro do gsap.context da página (usePageMotion).
    ========================================================= */
-import { gsap, ScrollTrigger, reduced } from '../lib/motion.js';
+import { gsap, ScrollTrigger, reduced, touch } from '../lib/motion.js';
 
 /* ---------- Hero: entrada cinematográfica ---------- */
 export const heroIntro = (scope) => {
@@ -27,7 +27,9 @@ export const heroIntro = (scope) => {
     .fromTo(meta, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.07 }, 0.2)
     .fromTo(nameLines, { yPercent: 125, y: 0 }, { yPercent: 0, y: 0, duration: 1.3, stagger: 0.1 }, 0.35)
     .fromTo(titleLines, { yPercent: 125, y: 0 }, { yPercent: 0, y: 0, duration: 1.1, stagger: 0.09 }, 0.7)
-    .fromTo(desc, { opacity: 0, y: 18, filter: 'blur(6px)' }, { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1, clearProps: 'filter' }, 0.9)
+    .fromTo(desc,
+      touch ? { opacity: 0, y: 18 } : { opacity: 0, y: 18, filter: 'blur(6px)' },
+      touch ? { opacity: 1, y: 0, duration: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1, clearProps: 'filter' }, 0.9)
     .add(() => bottom && bottom.classList.add('is-in'), 0.95) // linha do rodapé do hero se desenha
     .fromTo(tags, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.05 }, 1.05)
     .fromTo(scroll, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.7 }, 1.3);

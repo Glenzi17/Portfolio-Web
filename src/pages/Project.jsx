@@ -21,14 +21,26 @@ import Footer from '../components/Footer.jsx';
 // verticais sem perder a proporção.
 const Caption = ({ text }) => (text ? <figcaption className="caption small" data-reveal>{text}</figcaption> : null);
 
-const Figure = ({ img, ratio, n }) => {
+const Figure = ({ img, ratio, n, sizes }) => {
   const im = img || {};
   return (
     <figure className="img-reveal" style={{ '--r': ratioOf(im, { ratio }).toFixed(4) }}>
-      <Plate img={im} index={n} ratio={ratio} />
+      <Plate img={im} index={n} ratio={ratio} sizes={sizes} />
       <Caption text={im.caption} />
     </figure>
   );
+};
+
+// Largura que cada bloco ocupa (para o srcset escolher a variante certa).
+// Blocos "full" e o hero são limitados em altura (78vh no celular): um cartaz
+// 4:5 nunca passa de ~62vh de largura, então não precisa da variante maior.
+const SIZES = {
+  full: '(max-width: 860px) min(100vw, 62vh), 70vw',
+  wide: '100vw',
+  split: '(max-width: 860px) 100vw, 50vw',
+  overlap: '(max-width: 860px) 100vw, 66vw',
+  hero: '(max-width: 860px) min(100vw, 62vh), 70vw',
+  next: '(max-width: 860px) 50vw, 33vw',
 };
 
 /* ---------- Blocos de layout ---------- */
@@ -36,19 +48,19 @@ function Block({ b, n }) {
   switch (b.type) {
     case 'full':
     case 'wide':
-      return <div className={`blk blk--${b.type}`}><Figure img={b.image} ratio={b.ratio} n={n} /></div>;
+      return <div className={`blk blk--${b.type}`}><Figure img={b.image} ratio={b.ratio} n={n} sizes={SIZES[b.type]} /></div>;
     case 'split':
     case 'overlap':
       return (
         <div className={`blk blk--${b.type}`}>
-          {(b.images || []).map((im, i) => <Figure key={i} img={im} ratio={b.ratio} n={n} />)}
+          {(b.images || []).map((im, i) => <Figure key={i} img={im} ratio={b.ratio} n={n} sizes={SIZES[b.type]} />)}
         </div>
       );
     case 'detail':
       return (
         <div className="blk blk--detail">
           <figure className="img-reveal blk--detail" style={{ '--zoom': String(b.zoom || 1.5), '--focus': b.focus || '50% 50%' }}>
-            <Plate img={b.image} index={n} ratio={b.ratio || '16/9'} />
+            <Plate img={b.image} index={n} ratio={b.ratio || '16/9'} sizes="100vw" />
             <Caption text={b.image && b.image.caption} />
           </figure>
         </div>
@@ -138,7 +150,7 @@ function Project({ p, idx }) {
         </div>
 
         <figure className="project__hero" id="project-hero" style={{ '--r': ratioOf(p.cover).toFixed(4) }}>
-          <Plate img={p.cover} index={n} className="plate--hero" />
+          <Plate img={p.cover} index={n} className="plate--hero" sizes={SIZES.hero} priority />
         </figure>
 
         <div className="project__sections">
@@ -168,7 +180,7 @@ function Project({ p, idx }) {
             </h2>
             <p className="label next__cat" data-reveal>{next.category} <span className="next__arrow">→</span></p>
           </div>
-          <figure className="next__fig img-reveal"><Plate img={next.cover} index={nn} /></figure>
+          <figure className="next__fig img-reveal"><Plate img={next.cover} index={nn} sizes={SIZES.next} /></figure>
         </a>
       </section>
 

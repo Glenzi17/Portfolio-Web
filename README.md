@@ -65,8 +65,20 @@ Blocos disponíveis: `full`, `wide`, `split` (2 imagens), `overlap` (2 imagens),
 ### Trocar / adicionar imagens
 
 1. Coloque o arquivo (WebP, até 1800 px) em `public/assets/img/projects/<slug>/`.
-2. Rode `npm run media` (precisa de Python com Pillow: `py -m pip install pillow`). Isso regenera `src/data/media.js` com as dimensões — é o que faz a prancha assumir a proporção exata da peça, sem cortes.
-3. Referencie em `projects.js` com caminho absoluto `/assets/img/...`.
+2. Rode `npm run media` (precisa de Python com Pillow: `py -m pip install pillow`). Isso:
+   - regenera `src/data/media.js` com as dimensões — é o que faz a prancha assumir a proporção exata da peça, sem cortes;
+   - cria as variantes responsivas `nome@640.webp`, `nome@1000.webp`, `nome@1400.webp` ao lado do original (o celular baixa a menor que serve, via `srcset`). Não edite nem referencie as variantes à mão.
+3. Referencie em `projects.js` com caminho absoluto `/assets/img/...` (sempre o original, sem `@`).
+
+### Vídeo
+
+O player usa o arquivo original no desktop e, no celular, a variante `nome@720.mp4` se ela existir. Para gerar (precisa de ffmpeg):
+
+```
+ffmpeg -i reel.mp4 -vf scale=720:-2 -c:v libx264 -preset slow -crf 26 -pix_fmt yuv420p -movflags +faststart -c:a aac -b:a 96k reel@720.mp4
+```
+
+Depois rode `npm run media` para registrar a variante.
 
 ### Contato
 

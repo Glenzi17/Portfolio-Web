@@ -43,13 +43,17 @@ const layout = (projects) => {
     if (row.length === 1) {
       const it = row[0]; const s = SPAN[it.o];
       it.col = it.o === 'pano' ? '1 / 13' : ri % 2 ? `${13 - s} / 13` : `1 / ${1 + s}`;
+      it.span = it.o === 'pano' ? 12 : s;
       return;
     }
     const [a, b] = row; let sa = SPAN[a.o], sb = SPAN[b.o];
     while (sa + sb > 11) { if (sa >= sb) sa--; else sb--; } // garante ao menos 1 coluna de respiro
     a.col = `1 / ${1 + sa}`; b.col = `${13 - sb} / 13`;
+    a.span = sa; b.span = sb;
     (ri % 2 ? a : b).offset = true;
   });
+  // Largura do card na tela (para o srcset): tela inteira no celular, fração da grade no desktop
+  items.forEach((it) => { it.sizes = `(max-width: 860px) 100vw, ${Math.round((it.span / 12) * 100)}vw`; });
   return items;
 };
 
@@ -134,7 +138,7 @@ export default function Home() {
             </div>
 
             <div className="about__visual">
-              <figure className="about__frame img-reveal" id="about-frame">
+              <figure className={`about__frame img-reveal${SITE.portrait ? '' : ' about__frame--mono'}`} id="about-frame">
                 {/* Foto: defina SITE.portrait em src/data/projects.js. Sem foto, mostra o monograma. */}
                 {SITE.portrait
                   ? <img src={SITE.portrait} alt="Retrato de Guilherme Lenzi" loading="lazy" decoding="async" />
@@ -196,7 +200,7 @@ export default function Home() {
           </h2>
 
           <div className="grid work" id="work-grid">
-            {grid.map(({ p, col, offset }, i) => {
+            {grid.map(({ p, col, offset, sizes }, i) => {
               const n = pad2(i + 1);
               return (
                 <a
@@ -208,7 +212,7 @@ export default function Home() {
                   data-cursor="View<br>project"
                   aria-label={`${p.title} — ${p.category}`}
                 >
-                  <div className="work__fig"><Plate img={p.cover} index={n} /></div>
+                  <div className="work__fig"><Plate img={p.cover} index={n} sizes={sizes} /></div>
                   <div className="work__meta">
                     <span className="label">{n}</span>
                     <div>

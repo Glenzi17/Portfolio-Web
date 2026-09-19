@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { ScrollTrigger, reduced, touch } from '../lib/motion.js';
+import { videoSrcFor } from '../lib/media.js';
 
 const fmt = (s) => {
   s = Math.max(0, Math.floor(s || 0));
@@ -18,6 +19,8 @@ export default function Player({ src, poster, caption, ratio }) {
   const userPaused = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
+  // Celular/tela pequena: variante 720p (1 MB) em vez do arquivo cheio (4,5 MB)
+  const file = useMemo(() => videoSrcFor(src, touch || window.innerWidth <= 860), [src]);
 
   useEffect(() => {
     const video = videoRef.current;
@@ -112,7 +115,7 @@ export default function Player({ src, poster, caption, ratio }) {
     <div className={cls} ref={boxRef} style={{ '--ratio': ratio }}>
       <video
         ref={videoRef}
-        src={src}
+        src={file}
         poster={poster || undefined}
         muted
         loop

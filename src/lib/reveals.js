@@ -27,14 +27,13 @@ export const initReveals = (scope) => {
     });
   });
 
-  // Fade up + blur → sharp
+  // Fade up + blur → sharp (sem blur no toque: filtro animado pesa na GPU do celular)
   scope.querySelectorAll('[data-reveal]').forEach((el) => {
     const dir = el.dataset.reveal || 'up';
-    const from = { opacity: 0, y: dir === 'up' ? 28 : dir === 'down' ? -20 : 0, filter: 'blur(6px)' };
-    gsap.fromTo(el, from, {
-      opacity: 1, y: 0, filter: 'blur(0px)', duration: 1.1, clearProps: 'filter',
-      scrollTrigger: { trigger: el, start: startFor(el, 90), once: true },
-    });
+    const from = { opacity: 0, y: dir === 'up' ? 28 : dir === 'down' ? -20 : 0 };
+    const to = { opacity: 1, y: 0, duration: 1.1, scrollTrigger: { trigger: el, start: startFor(el, 90), once: true } };
+    if (!touch) { from.filter = 'blur(6px)'; to.filter = 'blur(0px)'; to.clearProps = 'filter'; }
+    gsap.fromTo(el, from, to);
   });
 
   // Grupo com stagger
