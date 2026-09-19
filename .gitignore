@@ -1,0 +1,24 @@
+# Python (tools/)
+__pycache__/
+*.pyc
+
+# SO / editores
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+
+# Saídas de teste (Playwright, screenshots)
+*.png
+!assets/**/*.png
+test-results/
+playwright-report/
+
+# Futuro React / Vercel
+node_modules/
+dist/
+build/
+.vercel/
+.env
+.env.*
