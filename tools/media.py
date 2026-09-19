@@ -1,19 +1,19 @@
-"""Gera js/media.js com as dimensões de todas as imagens/vídeos de assets/img.
+"""Gera src/data/media.js com as dimensões de todas as imagens/vídeos de public/assets/img.
 
 As pranchas (.plate) usam essas dimensões para assumir a proporção exata de
 cada peça — é isso que garante o enquadramento sem cortes nem sobras.
 
 Rodar depois de adicionar ou trocar qualquer imagem:
-    py tools/media.py
+    npm run media        (ou: py tools/media.py)
 """
-import json
 import os
 import struct
 import sys
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-IMG = os.path.join(ROOT, 'assets', 'img')
-OUT = os.path.join(ROOT, 'js', 'media.js')
+PUBLIC = os.path.join(ROOT, 'public')
+IMG = os.path.join(PUBLIC, 'assets', 'img')
+OUT = os.path.join(ROOT, 'src', 'data', 'media.js')
 
 try:
     from PIL import Image
@@ -42,7 +42,8 @@ media = {}
 for dirpath, _, files in os.walk(IMG):
     for name in sorted(files):
         path = os.path.join(dirpath, name)
-        rel = os.path.relpath(path, ROOT).replace(os.sep, '/')
+        # Chave = URL pública absoluta (public/ é servido na raiz pelo Vite)
+        rel = '/' + os.path.relpath(path, PUBLIC).replace(os.sep, '/')
         ext = name.lower().rsplit('.', 1)[-1]
         if ext in ('webp', 'png', 'jpg', 'jpeg', 'avif', 'gif'):
             with Image.open(path) as im:
@@ -53,7 +54,7 @@ for dirpath, _, files in os.walk(IMG):
                 media[rel] = list(size)
 
 lines = ['/* GERADO por tools/media.py — não editar à mão. Dimensões [largura, altura] de cada peça. */',
-         'window.MEDIA = {']
+         'export const MEDIA = {']
 for k in sorted(media):
     lines.append(f"  '{k}': [{media[k][0]}, {media[k][1]}],")
 lines.append('};')

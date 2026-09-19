@@ -498,8 +498,6 @@ input, textarea { font: inherit; color: inherit; }
 .preloader__bar { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 40px; height: 1px; background: var(--line); }
 .preloader__bar i { position: absolute; inset: 0; background: var(--ink); transform-origin: left; transform: scaleX(0); }
 html:not(.js) .preloader, html:not(.js) .curtain { display: none; }
-html.from-transition .curtain { transform: translateY(0); }
-html.from-transition .preloader { display: none; }
 .js [data-reveal] { opacity: 0; }
 
 /* ---------- 14. PÁGINA DE PROJETO ---------- */
