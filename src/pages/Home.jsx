@@ -24,6 +24,20 @@ const EXPERIENCE = [
   { year: '2026', title: 'Hoje', text: 'Sempre evoluindo.' },
 ];
 
+const SERVICES = [
+  { title: 'Identidade visual', tags: 'Branding / Papelaria', text: 'Marcas, logotipos e sistemas visuais consistentes, do cartão de visita ao digital.' },
+  { title: 'Campanhas', tags: 'Key visual / PDV / Social', tone: 'ink', text: 'Conceito, direção de arte e desdobramento de peças para campanhas publicitárias e promocionais.' },
+  { title: 'Digital', tags: 'UI / Web', tone: 'line', text: 'Interfaces, sites e peças digitais pensadas para comunicar bem e funcionar em qualquer tela.' },
+];
+
+// Anos de estrada saem da própria linha do tempo
+const STATS = [
+  { value: pad2(PROJECTS.length), label: 'Projetos selecionados' },
+  { value: `${Number(EXPERIENCE.at(-1).year) - Number(EXPERIENCE[0].year)}+`, label: 'Anos criando' },
+  { value: '360°', label: 'Campanhas integradas' },
+  { value: pad2(SERVICES.length), label: 'Frentes de atuação' },
+];
+
 /* ---------- Grid de projetos ----------
    Cada capa mantém a própria proporção; a largura do card vem da orientação
    (retrato 5 col · quadrado 6 · paisagem 7 · panorâmica linha inteira).
@@ -99,7 +113,13 @@ export default function Home() {
                 <span className="l" data-hero-title><span>Designer gráfico</span></span>
                 <span className="l" data-hero-title><span><span className="serif">&amp;</span> diretor criativo</span></span>
               </p>
-              <p className="hero__desc" data-hero="desc">Transformo ideias em identidades, experiências e soluções visuais com conceito, estética e propósito.</p>
+              <div className="hero__aside" data-hero="desc">
+                <p className="hero__desc">Transformo ideias em identidades, experiências e soluções visuais com conceito, estética e propósito.</p>
+                <div className="hero__cta">
+                  <a className="btn" href="#projetos">Ver projetos <span className="btn__arrow">↓</span></a>
+                  <a className="btn btn--ghost" href="#contato">Contato</a>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -126,15 +146,7 @@ export default function Home() {
                 <span className="l" data-lines><span>Designer com</span></span>
                 <span className="l" data-lines><span>visão <span className="serif">criativa.</span></span></span>
               </h2>
-              <p className="lead about__body" data-reveal>Sou designer gráfico focado na criação de identidades visuais, peças publicitárias e projetos digitais. Tenho interesse em explorar diferentes linguagens visuais, combinando tipografia, composição, cores e direção de arte para transformar ideias em soluções visuais marcantes.</p>
-
-              <ul className="disc" data-reveal-group aria-label="Disciplinas">
-                <li><span className="label">01</span>Graphic design</li>
-                <li><span className="label">02</span>Branding</li>
-                <li><span className="label">03</span>Art direction</li>
-                <li><span className="label">04</span>UI/UX</li>
-                <li><span className="label">05</span>Digital design</li>
-              </ul>
+              <p className="lead about__body" data-reveal>Sou designer gráfico focado na criação de identidades visuais, peças publicitárias e projetos digitais. <span className="mute">Tenho interesse em explorar diferentes linguagens visuais, combinando tipografia, composição, cores e direção de arte para transformar ideias em soluções visuais marcantes.</span></p>
             </div>
 
             <div className="about__visual">
@@ -145,6 +157,32 @@ export default function Home() {
                   : <div className="about__mono" data-parallax="-0.06" aria-hidden="true">G<span className="serif">L</span></div>}
               </figure>
             </div>
+          </div>
+
+          <div className="services">
+            <div className="services__head" data-reveal data-line>
+              <span className="label label--ink">O que eu faço</span>
+              <span className="label">{pad2(SERVICES.length)} frentes</span>
+            </div>
+            <div className="services__list" data-reveal-group>
+              {SERVICES.map((s, i) => (
+                <article className={`service${s.tone ? ` service--${s.tone}` : ''}`} key={s.title}>
+                  <div className="service__top">
+                    <span className="label">{s.tags}</span>
+                    <span className="label">{pad2(i + 1)}.</span>
+                  </div>
+                  <div>
+                    <h3>{s.title}</h3>
+                    <p>{s.text}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+            <dl className="stats" data-reveal-group>
+              {STATS.map((s) => (
+                <div key={s.label}><dt className="label">{s.label}</dt><dd>{s.value}</dd></div>
+              ))}
+            </dl>
           </div>
 
           <div className="tools">
