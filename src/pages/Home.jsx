@@ -11,6 +11,7 @@ import { useShell } from '../components/ShellContext.js';
 import Plate from '../components/Plate.jsx';
 import ContactForm from '../components/ContactForm.jsx';
 import Footer from '../components/Footer.jsx';
+import Fluid from '../components/Fluid.jsx';
 
 const TITLE = 'Guilherme Lenzi — Designer Gráfico & Diretor Criativo';
 const DESC = 'Portfólio de Guilherme Lenzi: identidades visuais, campanhas publicitárias, direção de arte e experiências digitais com conceito, estética e propósito.';
@@ -29,7 +30,7 @@ const MARQUEE = ['Branding', 'Campanhas', 'Direção de arte', 'Key visual', 'Di
 const SERVICES = [
   { title: 'Identidade visual', tags: 'Branding / Papelaria', tone: 'lime', text: 'Marcas, logotipos e sistemas visuais consistentes, do cartão de visita ao digital.' },
   { title: 'Campanhas', tags: 'Key visual / PDV / Social', tone: 'ink', text: 'Conceito, direção de arte e desdobramento de peças para campanhas publicitárias e promocionais.' },
-  { title: 'Digital', tags: 'UI / Web', tone: 'cobalt', text: 'Interfaces, sites e peças digitais pensadas para comunicar bem e funcionar em qualquer tela.' },
+  { title: 'Digital', tags: 'UI / Web', tone: 'ocean', text: 'Interfaces, sites e peças digitais pensadas para comunicar bem e funcionar em qualquer tela.' },
 ];
 
 // Anos de estrada saem da própria linha do tempo
@@ -149,7 +150,8 @@ export default function Home() {
             </div>
 
             <div className="about__visual">
-              <figure className={`about__frame img-reveal${SITE.portrait ? '' : ' about__frame--mono'}`} id="about-frame">
+              <figure className={`about__frame img-reveal${SITE.portrait ? '' : ' about__frame--mono fluid-host'}`} id="about-frame">
+                {!SITE.portrait && <Fluid seed={9.1} />}
                 {/* Foto: defina SITE.portrait em src/data/projects.js. Sem foto, mostra o monograma. */}
                 {SITE.portrait
                   ? <img src={SITE.portrait} alt="Retrato de Guilherme Lenzi" loading="lazy" decoding="async" />
@@ -165,7 +167,8 @@ export default function Home() {
             </div>
             <div className="services__list" data-reveal-group>
               {SERVICES.map((s, i) => (
-                <article className={`service${s.tone ? ` service--${s.tone}` : ''}`} key={s.title}>
+                <article className={`service${s.tone ? ` service--${s.tone}` : ''}${s.tone === 'ocean' ? ' fluid-host' : ''}`} key={s.title}>
+                  {s.tone === 'ocean' && <Fluid seed={4.2} />}
                   <div className="service__top">
                     <span className="label">{s.tags}</span>
                     <span className="label">{pad2(i + 1)}.</span>
@@ -239,7 +242,7 @@ export default function Home() {
         {/* ======================= 03 PROJETOS ======================= */}
         <section className="section container" id="projetos">
           <div className="section-head" data-reveal data-line>
-            <span className="label label--ink chip" style={{ '--chip': 'var(--cobalt)' }}><i />03 / Selected work</span>
+            <span className="label label--ink chip" style={{ '--chip': 'var(--ocean)' }}><i />03 / Selected work</span>
             <span className="label"><span id="work-count">{pad2(PROJECTS.length)}</span> projetos</span>
           </div>
           <h2 className="h2 work__heading">
@@ -277,7 +280,8 @@ export default function Home() {
         </section>
 
         {/* ======================= 04 CONTATO ======================= */}
-        <section className="section contact" id="contato" data-dark>
+        <section className="section contact fluid-host" id="contato" data-dark>
+          <Fluid seed={1.3} />
           <div className="container">
             <div className="section-head" data-reveal data-line>
               <span className="label label--ink chip" style={{ '--chip': 'var(--lime)' }}><i />04 / Contato</span>

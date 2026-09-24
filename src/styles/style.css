@@ -16,7 +16,15 @@
   --line: rgba(17, 17, 17, 0.12);
   --line-strong: rgba(17, 17, 17, 0.3);
   --accent: #ff4f1f;            /* vermelhão: estados ativos, hovers, faixa */
-  --cobalt: #2a3bff;            /* azul cobalto: contato, painel digital, transição */
+  --ocean: #1660ab;             /* azul-oceano: contato, painel digital, transição */
+  --ocean-deep: #131c28;
+  --aqua: #57beaf;
+  /* Textura líquida em CSS: fallback do shader (Fluid.jsx) e fundo da cortina */
+  --fluid-css:
+    radial-gradient(55% 45% at 18% 85%, rgba(87, 190, 175, 0.9), transparent 70%),
+    radial-gradient(60% 55% at 85% 15%, rgba(31, 128, 177, 0.95), transparent 70%),
+    radial-gradient(70% 70% at 55% 55%, #134397, transparent 75%),
+    var(--ocean-deep);
   --lime: #d6f25a;              /* lima: destaques pontuais sobre escuro */
 
   --font-display: "Inter Tight", "Inter", system-ui, sans-serif;
@@ -174,6 +182,11 @@ input, textarea { font: inherit; color: inherit; }
 }
 .plate--bleed { --frame: 0px; }
 .plate--bleed > img, .plate--bleed > video { object-fit: cover; }
+
+/* Fundo líquido (Fluid.jsx): o canvas fica atrás do conteúdo do bloco;
+   sem WebGL, o gradiente em CSS continua lá. */
+.fluid-host { position: relative; isolation: isolate; background: var(--fluid-css); }
+.fluid { position: absolute; inset: 0; z-index: -1; display: block; width: 100%; height: 100%; }
 
 /* Placeholder */
 .ph {
@@ -337,7 +350,7 @@ input, textarea { font: inherit; color: inherit; }
   display: grid; place-items: center;
 }
 .about__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.about__frame--mono { background: var(--cobalt); color: var(--bg); }
+.about__frame--mono { color: var(--bg); }
 .about__frame--mono .serif { color: var(--lime); }
 .about__mono {
   font-family: var(--font-display); font-weight: 500; letter-spacing: -0.07em; line-height: 0.8;
@@ -357,7 +370,7 @@ input, textarea { font: inherit; color: inherit; }
 }
 .service--lime { background: var(--lime); --mute: rgba(17, 17, 17, 0.62); }
 .service--ink { background: var(--ink); color: var(--bg); --mute: rgba(245, 245, 243, 0.6); }
-.service--cobalt { background: var(--cobalt); color: var(--bg); --mute: rgba(245, 245, 243, 0.72); }
+.service--ocean { color: var(--bg); --mute: rgba(245, 245, 243, 0.78); }
 .service__top .label:last-child { transition: transform var(--t) var(--ease); }
 @media (hover: hover) {
   .service:hover { transform: translateY(-6px); }
@@ -473,7 +486,7 @@ input, textarea { font: inherit; color: inherit; }
 /* ---------- 10. CONTATO ---------- */
 /* Folha escura de cantos arredondados que continua no rodapé */
 .contact {
-  background: var(--cobalt); color: var(--bg); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  color: var(--bg); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   --line: rgba(245, 245, 243, 0.24); --line-strong: rgba(245, 245, 243, 0.45); --mute: rgba(245, 245, 243, 0.72);
 }
 .contact ::selection { background: var(--bg); color: var(--ink); }
@@ -584,7 +597,7 @@ input, textarea { font: inherit; color: inherit; }
 @media (hover: none), (pointer: coarse) { .cursor { display: none; } }
 
 /* ---------- 13. TRANSIÇÕES ---------- */
-.curtain { position: fixed; inset: 0; z-index: 500; background: var(--cobalt); transform: translateY(120%); pointer-events: none; }
+.curtain { position: fixed; inset: 0; z-index: 500; background: var(--fluid-css); transform: translateY(120%); pointer-events: none; }
 /* faixa lima colada à borda de cima: lidera a entrada e a saída (em repouso fica fora da tela: 120% − 18vh) */
 .curtain::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 18vh; background: var(--lime); }
 .curtain__label { position: absolute; left: var(--gutter); bottom: 40px; color: var(--bg); opacity: 0; }
