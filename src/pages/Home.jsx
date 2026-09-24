@@ -6,7 +6,7 @@ import { SITE, PROJECTS } from '../data/projects.js';
 import { ratioOf, pad2 } from '../lib/media.js';
 import { usePageMotion } from '../lib/usePageMotion.js';
 import { initReveals, initDarkNav } from '../lib/reveals.js';
-import { heroIntro, revealWork, initTimeline, initActiveNav, contactEnter } from './home-motion.js';
+import { heroIntro, revealWork, initTimeline, initActiveNav, contactEnter, wordFill, countUp, marquee } from './home-motion.js';
 import { useShell } from '../components/ShellContext.js';
 import Plate from '../components/Plate.jsx';
 import ContactForm from '../components/ContactForm.jsx';
@@ -24,10 +24,12 @@ const EXPERIENCE = [
   { year: '2026', title: 'Hoje', text: 'Sempre evoluindo.' },
 ];
 
+const MARQUEE = ['Branding', 'Campanhas', 'Direção de arte', 'Key visual', 'Digital', 'Identidade visual'];
+
 const SERVICES = [
-  { title: 'Identidade visual', tags: 'Branding / Papelaria', text: 'Marcas, logotipos e sistemas visuais consistentes, do cartão de visita ao digital.' },
+  { title: 'Identidade visual', tags: 'Branding / Papelaria', tone: 'lime', text: 'Marcas, logotipos e sistemas visuais consistentes, do cartão de visita ao digital.' },
   { title: 'Campanhas', tags: 'Key visual / PDV / Social', tone: 'ink', text: 'Conceito, direção de arte e desdobramento de peças para campanhas publicitárias e promocionais.' },
-  { title: 'Digital', tags: 'UI / Web', tone: 'line', text: 'Interfaces, sites e peças digitais pensadas para comunicar bem e funcionar em qualquer tela.' },
+  { title: 'Digital', tags: 'UI / Web', tone: 'cobalt', text: 'Interfaces, sites e peças digitais pensadas para comunicar bem e funcionar em qualquer tela.' },
 ];
 
 // Anos de estrada saem da própria linha do tempo
@@ -89,6 +91,9 @@ export default function Home() {
     initTimeline(el);
     initActiveNav(el);
     contactEnter(el);
+    wordFill(el);
+    countUp(el);
+    marquee(el);
     initDarkNav(el);
   });
 
@@ -111,15 +116,9 @@ export default function Home() {
             <div className="hero__row">
               <p className="hero__title">
                 <span className="l" data-hero-title><span>Designer gráfico</span></span>
-                <span className="l" data-hero-title><span><span className="serif">&amp;</span> diretor criativo</span></span>
+                <span className="l" data-hero-title><span><span className="serif hero__amp">&amp;</span> diretor criativo</span></span>
               </p>
-              <div className="hero__aside" data-hero="desc">
-                <p className="hero__desc">Transformo ideias em identidades, experiências e soluções visuais com conceito, estética e propósito.</p>
-                <div className="hero__cta">
-                  <a className="btn" href="#projetos">Ver projetos <span className="btn__arrow">↓</span></a>
-                  <a className="btn btn--ghost" href="#contato">Contato</a>
-                </div>
-              </div>
+              <p className="hero__desc" data-hero="desc">Transformo ideias em identidades, experiências e soluções visuais com conceito, estética e propósito.</p>
             </div>
           </div>
 
@@ -137,7 +136,7 @@ export default function Home() {
         {/* ======================= 01 SOBRE ======================= */}
         <section className="section container" id="sobre">
           <div className="section-head" data-reveal data-line>
-            <span className="label label--ink">01 / Sobre</span>
+            <span className="label label--ink chip" style={{ '--chip': 'var(--lime)' }}><i />01 / Sobre</span>
           </div>
 
           <div className="grid about">
@@ -146,7 +145,7 @@ export default function Home() {
                 <span className="l" data-lines><span>Designer com</span></span>
                 <span className="l" data-lines><span>visão <span className="serif">criativa.</span></span></span>
               </h2>
-              <p className="lead about__body" data-reveal>Sou designer gráfico focado na criação de identidades visuais, peças publicitárias e projetos digitais. <span className="mute">Tenho interesse em explorar diferentes linguagens visuais, combinando tipografia, composição, cores e direção de arte para transformar ideias em soluções visuais marcantes.</span></p>
+              <p className="lead about__body" data-words>Sou designer gráfico focado na criação de identidades visuais, peças publicitárias e projetos digitais. Tenho interesse em explorar diferentes linguagens visuais, combinando tipografia, composição, cores e direção de arte para transformar ideias em soluções visuais marcantes.</p>
             </div>
 
             <div className="about__visual">
@@ -180,7 +179,7 @@ export default function Home() {
             </div>
             <dl className="stats" data-reveal-group>
               {STATS.map((s) => (
-                <div key={s.label}><dt className="label">{s.label}</dt><dd>{s.value}</dd></div>
+                <div key={s.label}><dt className="label">{s.label}</dt><dd data-count>{s.value}</dd></div>
               ))}
             </dl>
           </div>
@@ -200,7 +199,7 @@ export default function Home() {
         {/* ======================= 02 EXPERIÊNCIA ======================= */}
         <section className="section container" id="experiencia">
           <div className="section-head" data-reveal data-line>
-            <span className="label label--ink">02 / Experiência</span>
+            <span className="label label--ink chip" style={{ '--chip': 'var(--accent)' }}><i />02 / Experiência</span>
             <span className="label">2021 — hoje</span>
           </div>
 
@@ -226,10 +225,21 @@ export default function Home() {
           </div>
         </section>
 
+        {/* Faixa com as frentes de trabalho: anda sozinha e acelera com o scroll */}
+        <div className="marquee" aria-hidden="true" data-dark>
+          <div className="marquee__track">
+            {[0, 1].map((k) => (
+              <span className="marquee__group" key={k}>
+                {MARQUEE.map((w) => <span key={w}>{w}<i>✦</i></span>)}
+              </span>
+            ))}
+          </div>
+        </div>
+
         {/* ======================= 03 PROJETOS ======================= */}
         <section className="section container" id="projetos">
           <div className="section-head" data-reveal data-line>
-            <span className="label label--ink">03 / Selected work</span>
+            <span className="label label--ink chip" style={{ '--chip': 'var(--cobalt)' }}><i />03 / Selected work</span>
             <span className="label"><span id="work-count">{pad2(PROJECTS.length)}</span> projetos</span>
           </div>
           <h2 className="h2 work__heading">
@@ -244,10 +254,11 @@ export default function Home() {
                 <a
                   key={p.slug}
                   className={`work__item${offset ? ' work__item--offset' : ''}`}
-                  style={{ '--col': col }}
+                  style={{ '--col': col, '--c': p.color }}
                   href={`/projeto/${p.slug}`}
                   data-transition={p.title}
                   data-cursor="View<br>project"
+                  data-cursor-color={p.color}
                   aria-label={`${p.title} — ${p.category}`}
                 >
                   <div className="work__fig"><Plate img={p.cover} index={n} sizes={sizes} /></div>
@@ -255,7 +266,7 @@ export default function Home() {
                     <span className="label">{n}</span>
                     <div>
                       <h3 className="work__title">{p.title} {p.subtitle ? <span className="serif">{p.subtitle}</span> : null}</h3>
-                      <p className="label work__cat">{p.category}</p>
+                      <p className="label work__cat chip" style={{ '--chip': p.color }}><i />{p.category}</p>
                     </div>
                     <span className="label">{p.year}</span>
                   </div>
@@ -269,7 +280,7 @@ export default function Home() {
         <section className="section contact" id="contato" data-dark>
           <div className="container">
             <div className="section-head" data-reveal data-line>
-              <span className="label label--ink">04 / Contato</span>
+              <span className="label label--ink chip" style={{ '--chip': 'var(--lime)' }}><i />04 / Contato</span>
             </div>
 
             <h2 className="display contact__title">

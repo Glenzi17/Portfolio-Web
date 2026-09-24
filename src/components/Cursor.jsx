@@ -31,6 +31,10 @@ export default function Cursor() {
       cursor.classList.toggle('is-link', !view && !!link);
       cursor.classList.toggle('is-hidden', !!e.target.closest('input, textarea'));
       if (view) label.innerHTML = view.dataset.cursor || 'View<br>project';
+      // Sobre um card de projeto a bolha assume a cor da marca
+      const color = view && view.dataset.cursorColor;
+      cursor.classList.toggle('is-color', !!color);
+      if (color) cursor.style.setProperty('--cursor-c', color);
     };
     const onLeave = () => cursor.classList.remove('is-visible');
     const onEnter = () => cursor.classList.add('is-visible');

@@ -134,7 +134,7 @@ function Project({ p, idx }) {
       <main className="project container" id="main">
         <div className="grid project__head">
           <div className="project__index" data-reveal="down">
-            <span className="label label--ink">Project {n} / {total}</span>
+            <span className="label label--ink chip" style={{ '--chip': p.color }}><i />Project {n} / {total}</span>
             <a className="label link-arrow" href="/#projetos" data-transition="Projetos"><span className="link-arrow__i">←</span> Todos os projetos</a>
           </div>
           <div className="project__title">
@@ -171,7 +171,7 @@ function Project({ p, idx }) {
 
       {/* ---------- Next project ---------- */}
       <section className="project__next container" id="project-next" data-line="top">
-        <a className="next" href={`/projeto/${next.slug}`} data-transition={next.title} data-cursor="Next<br>project">
+        <a className="next" href={`/projeto/${next.slug}`} data-transition={next.title} data-cursor="Next<br>project" data-cursor-color={next.color} style={{ '--c': next.color }}>
           <div className="next__label" data-reveal><span className="label label--ink">Next project</span><span className="label">{nn} / {total}</span></div>
           <div className="next__title">
             <h2 className="display">

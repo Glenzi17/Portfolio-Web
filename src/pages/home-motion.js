@@ -132,14 +132,69 @@ export const initActiveNav = (scope) => {
   });
 };
 
-/* ---------- Transição para o bloco escuro de contato ---------- */
-// A seção sobe um pouco mais rápido que o scroll ao entrar (parallax leve),
-// em vez de simplesmente "aparecer" colada ao fim dos projetos.
+/* ---------- Contato: a folha abre até a largura total ---------- */
+// Entra como um cartão recuado das bordas e se expande enquanto sobe
+// (os cantos de baixo ficam retos porque o rodapé continua a folha).
 export const contactEnter = (scope) => {
   const contact = scope.querySelector('.contact');
   if (!contact || reduced) return;
-  gsap.fromTo(contact, { y: 72 }, {
-    y: 0, ease: 'none',
-    scrollTrigger: { trigger: contact, start: 'top bottom', end: 'top 55%', scrub: true },
+  gsap.fromTo(contact,
+    { clipPath: 'inset(0% 4% 0% 4% round 40px 40px 0px 0px)' },
+    {
+      clipPath: 'inset(0% 0% 0% 0% round 24px 24px 0px 0px)', ease: 'none',
+      scrollTrigger: { trigger: contact, start: 'top bottom', end: 'top 25%', scrub: true },
+    });
+};
+
+/* ---------- Texto que se preenche palavra a palavra ([data-words]) ---------- */
+// O parágrafo começa apagado e cada palavra acende conforme a leitura avança.
+export const wordFill = (scope) => {
+  scope.querySelectorAll('[data-words]').forEach((p) => {
+    if (reduced) return;
+    const words = p.textContent.trim().split(/\s+/);
+    p.setAttribute('aria-label', p.textContent.trim());
+    p.innerHTML = words.map((w) => `<span class="w" aria-hidden="true">${w}</span>`).join(' ');
+    gsap.fromTo(p.querySelectorAll('.w'), { opacity: 0.16 }, {
+      opacity: 1, ease: 'none', stagger: 0.1,
+      scrollTrigger: { trigger: p, start: 'top 82%', end: 'bottom 50%', scrub: true },
+    });
+  });
+};
+
+/* ---------- Números que contam ao entrar ([data-count]) ---------- */
+// Mantém prefixo/sufixo e zeros à esquerda: "07", "5+", "360°".
+export const countUp = (scope) => {
+  if (reduced) return;
+  scope.querySelectorAll('[data-count]').forEach((el) => {
+    const m = el.textContent.match(/^(\D*)(\d+)(.*)$/);
+    if (!m) return;
+    const [, pre, num, post] = m;
+    const n = { v: 0 };
+    const render = () => { el.textContent = `${pre}${String(Math.round(n.v)).padStart(num.length, '0')}${post}`; };
+    render();
+    gsap.to(n, {
+      v: Number(num), duration: 1.6, ease: 'power3.out', onUpdate: render,
+      scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+    });
+  });
+};
+
+/* ---------- Faixa em loop que reage ao scroll (.marquee) ---------- */
+// Anda sozinha; rolar a página acelera e inverte o sentido junto com o scroll.
+export const marquee = (scope) => {
+  const band = scope.querySelector('.marquee');
+  if (!band || reduced) return;
+  const loop = gsap.to(band.querySelector('.marquee__track'), { xPercent: -50, duration: 32, ease: 'none', repeat: -1 });
+  loop.totalTime(loop.duration() * 200); // folga para tocar ao contrário sem parar no início
+  let dir = 1;
+  ScrollTrigger.create({
+    trigger: band, start: 'top bottom', end: 'bottom top',
+    onUpdate: (self) => {
+      dir = self.direction;
+      const boost = gsap.utils.clamp(1, 6, Math.abs(self.getVelocity()) / 250);
+      gsap.timeline({ overwrite: true })
+        .to(loop, { timeScale: dir * boost, duration: 0.2, ease: 'power1.out' })
+        .to(loop, { timeScale: dir, duration: 1.2, ease: 'power2.out' });
+    },
   });
 };

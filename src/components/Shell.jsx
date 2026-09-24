@@ -57,15 +57,21 @@ export default function Shell({ children }) {
     if (reduced || SEEN) { setReady(true); return undefined; }
     const pre = preRef.current;
     const count = pre.querySelector('.preloader__count');
-    const bar = pre.querySelector('.preloader__bar i');
+    const ring = pre.querySelector('.preloader__ring rect');
+    const glyphs = pre.querySelectorAll('.preloader__glyph > span');
+    const mark = pre.querySelector('.preloader__mark');
     const n = { v: 0 };
     if (lenis) lenis.stop();
+    // Monograma: o contorno se desenha junto com a contagem, as letras sobem
+    // pela máscara; no fim a tela recolhe para cima com a base arredondada.
     const tl = gsap.timeline({ onComplete: () => { setPreloading(false); if (lenis) lenis.start(); } })
-      .to(n, { v: 100, duration: 0.9, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(n.v)).padStart(2, '0'); } })
-      .to(bar, { scaleX: 1, duration: 0.9, ease: 'power2.inOut' }, 0)
-      .to([count, bar], { opacity: 0, duration: 0.25 }, '+=0.05')
-      .to(pre, { yPercent: -100, duration: 0.8, ease: EASE_IO }, '-=0.1')
-      .add(() => setReady(true), '-=0.5');
+      .to(n, { v: 100, duration: 1.1, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(n.v)).padStart(2, '0'); } })
+      .to(ring, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, 0)
+      .fromTo(glyphs, { yPercent: 110 }, { yPercent: 0, duration: 0.8, stagger: 0.08, ease: 'expo.out' }, 0.2)
+      .to(glyphs, { yPercent: -110, duration: 0.5, stagger: 0.05, ease: 'power3.in' }, '+=0.15')
+      .to([mark, count], { opacity: 0, scale: 0.94, duration: 0.4, ease: 'power2.in' }, '<0.1')
+      .to(pre, { clipPath: 'inset(0% 0% 100% 0% round 0px 0px 48px 48px)', duration: 0.9, ease: EASE_IO }, '-=0.15')
+      .add(() => setReady(true), '-=0.85'); // o hero começa a subir enquanto a tela recolhe
     return () => tl.kill();
   }, []);
 
@@ -82,7 +88,7 @@ export default function Shell({ children }) {
       gsap.timeline({ delay: 0.15 })
         .add(() => setReady(true), 0.1)
         .to(curtain, { y: '-100%', duration: 0.9, ease: EASE_IO }, 0)
-        .set(curtain, { y: '100%', pointerEvents: 'none' })
+        .set(curtain, { y: '120%', pointerEvents: 'none' })
         .set(labelRef.current, { opacity: 0 })
         .add(() => { if (lenis) lenis.start(); });
     } else {
@@ -143,8 +149,11 @@ export default function Shell({ children }) {
 
       {preloading && (
         <div className="preloader" aria-hidden="true" ref={preRef}>
-          <div className="preloader__count">00</div>
-          <div className="preloader__bar"><i /></div>
+          <div className="preloader__mark">
+            <svg className="preloader__ring" viewBox="0 0 120 120"><rect x="1" y="1" width="118" height="118" rx="30" pathLength="1" /></svg>
+            <span className="preloader__glyph"><span>G</span><span className="serif">L</span></span>
+          </div>
+          <div className="preloader__count label">00</div>
         </div>
       )}
       {!reduced && (

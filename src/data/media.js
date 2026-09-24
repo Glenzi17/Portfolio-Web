@@ -1,8 +1,8 @@
 /* GERADO por tools/media.py — não editar à mão.
    [largura, altura, larguras das variantes responsivas (nome@W.webp)] de cada peça. */
 export const MEDIA = {
-  '/assets/img/projects/aerion/outdoor-01.webp': [1800, 600, [640, 1000, 1400]],
-  '/assets/img/projects/aerion/outdoor-02.webp': [1800, 600, [640, 1000, 1400]],
+  '/assets/img/projects/aerion/outdoor-01.webp': [2800, 933, [640, 1000, 1400]],
+  '/assets/img/projects/aerion/outdoor-02.webp': [2800, 933, [640, 1000, 1400]],
   '/assets/img/projects/americans/tabloide-01.webp': [1350, 1800, [640, 1000]],
   '/assets/img/projects/americans/tabloide-02.webp': [1350, 1800, [640, 1000]],
   '/assets/img/projects/boulevard/capa.webp': [1440, 1800, [640, 1000]],
@@ -10,7 +10,7 @@ export const MEDIA = {
   '/assets/img/projects/boulevard/cores.webp': [1440, 1800, [640, 1000]],
   '/assets/img/projects/boulevard/detalhes.webp': [1440, 1800, [640, 1000]],
   '/assets/img/projects/boulevard/final.webp': [1440, 1800, [640, 1000]],
-  '/assets/img/projects/coca-cola/cartaz.webp': [1123, 1588, [640, 1000]],
+  '/assets/img/projects/coca-cola/cartaz.webp': [1600, 2261, [640, 1000, 1400]],
   '/assets/img/projects/coca-cola/kv.webp': [1800, 1012, [640, 1000, 1400]],
   '/assets/img/projects/coca-cola/reel-poster.webp': [1012, 1800, [640]],
   '/assets/img/projects/coca-cola/reel-still.webp': [1012, 1800, [640]],
@@ -25,8 +25,8 @@ export const MEDIA = {
   '/assets/img/projects/elma-chips/landing.webp': [1178, 1800, [640, 1000]],
   '/assets/img/projects/elma-chips/outdoor.webp': [1800, 600, [640, 1000, 1400]],
   '/assets/img/projects/elma-chips/story.webp': [1012, 1800, [640]],
-  '/assets/img/projects/lvcas/cartaz-01.webp': [1123, 1587, [640, 1000]],
-  '/assets/img/projects/lvcas/cartaz-02.webp': [1123, 1587, [640, 1000]],
+  '/assets/img/projects/lvcas/cartaz-01.webp': [1600, 2263, [640, 1000, 1400]],
+  '/assets/img/projects/lvcas/cartaz-02.webp': [1600, 2263, [640, 1000, 1400]],
   '/assets/img/projects/vertice/frente.webp': [1800, 1049, [640, 1000, 1400]],
   '/assets/img/projects/vertice/mockup-01.webp': [1800, 1049, [640, 1000, 1400]],
   '/assets/img/projects/vertice/mockup-02.webp': [1800, 1049, [640, 1000, 1400]],

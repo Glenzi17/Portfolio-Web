@@ -4,6 +4,8 @@
    Para adicionar um projeto: copie um bloco, mude o `slug`
    (ele vira a URL: /projeto/slug) e ajuste os campos.
    A ordem deste array define a ordem na home e o "next".
+   `color` é a cor da marca: tinge o card no hover, o cursor e
+   os detalhes da página do projeto.
 
    Imagens — toda imagem vai numa "prancha" e aparece INTEIRA.
    A prancha assume a proporção da própria peça (dimensões em
@@ -52,6 +54,7 @@ export const SITE = {
 export const PROJECTS = [
   {
     slug: 'elma-chips',
+    color: '#F56F13',
     title: 'Elma Chips',
     subtitle: 'Estoura a Sorte',
     category: 'Campanha publicitária',
@@ -116,6 +119,7 @@ export const PROJECTS = [
 
   {
     slug: 'coca-cola',
+    color: '#E40009',
     title: 'Coca-Cola',
     subtitle: 'Promoção Clássicos',
     category: 'Campanha promocional',
@@ -170,6 +174,7 @@ export const PROJECTS = [
 
   {
     slug: 'boulevard',
+    color: '#2F6B45',
     title: 'Boulevard',
     subtitle: 'SB Dunk',
     category: 'Branding / Sneakers',
@@ -225,6 +230,7 @@ export const PROJECTS = [
 
   {
     slug: 'vertice',
+    color: '#1B3A55',
     title: 'Vértice',
     subtitle: 'Arquitetura & Interiores',
     category: 'Identidade / Papelaria',
@@ -274,6 +280,7 @@ export const PROJECTS = [
 
   {
     slug: 'americans',
+    color: '#0A4DB0',
     title: 'Drogaria Americans',
     subtitle: 'Mega Feirão da Saúde',
     category: 'Varejo / Tabloide',
@@ -328,6 +335,7 @@ export const PROJECTS = [
 
   {
     slug: 'lvcas',
+    color: '#8E1B2A',
     title: 'LVCAS',
     subtitle: 'Coca-Cola × Rock in Rio',
     category: 'Cartaz / Direção de arte',
@@ -382,6 +390,7 @@ export const PROJECTS = [
 
   {
     slug: 'aerion',
+    color: '#2F5FD0',
     title: 'Aerion Airlines',
     subtitle: 'Santorini',
     category: 'Identidade / OOH',
