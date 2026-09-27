@@ -58,7 +58,7 @@ export const initReveals = (scope) => {
   // Reveal de imagens (clip + escala). No fim, limpa o transform inline para
   // o hover (CSS) voltar a valer.
   scope.querySelectorAll('.img-reveal').forEach((fig) => {
-    const media = fig.querySelector('.plate > img, .plate > video');
+    const media = fig.querySelector('.plate > img');
     const isDetail = fig.classList.contains('blk--detail');
     const tl = gsap.timeline({
       scrollTrigger: { trigger: fig, start: 'top 85%', once: true },

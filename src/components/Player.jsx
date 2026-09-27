@@ -19,8 +19,12 @@ export default function Player({ src, poster, caption, ratio }) {
   const userPaused = useRef(false);
   const [playing, setPlaying] = useState(false);
   const [muted, setMuted] = useState(true);
-  // Celular/tela pequena: variante 720p (1 MB) em vez do arquivo cheio (4,5 MB)
-  const file = useMemo(() => videoSrcFor(src, touch || window.innerWidth <= 860), [src]);
+  // Na página o vídeo nunca passa de ~84vh de altura: a variante 720p (1 MB)
+  // basta em qualquer tela e decodifica leve. O arquivo cheio (1080p, 4,5 MB)
+  // só entra em tela cheia no desktop.
+  const small = useMemo(() => videoSrcFor(src, true), [src]);
+  const full = src;
+  const [near, setNear] = useState(false); // perto da tela: começa a baixar
 
   useEffect(() => {
     const video = videoRef.current;
@@ -63,13 +67,30 @@ export default function Player({ src, poster, caption, ratio }) {
     };
     track.addEventListener('pointerdown', onDown);
 
+    // Baixa e decodifica o primeiro quadro bem antes de chegar (1,5 tela de
+    // folga): antes isso acontecia no instante em que o vídeo entrava, no
+    // meio da rolagem, e travava a página por ~0,4 s.
+    const io = new IntersectionObserver(([e]) => { if (e.isIntersecting) { setNear(true); io.disconnect(); } }, { rootMargin: '150% 0px' });
+    io.observe(box);
+
     let st = null;
     if (!reduced) {
       st = ScrollTrigger.create({
-        trigger: box, start: 'top 85%', end: 'bottom 15%',
+        trigger: box, start: 'top 75%', end: 'bottom 25%',
         onToggle: (s) => { if (s.isActive) { if (!userPaused.current) video.play().catch(() => {}); } else video.pause(); },
       });
     }
+
+    // Tela cheia no desktop: troca para o 1080p mantendo o ponto do vídeo
+    const onFs = () => {
+      if (touch) return;
+      const want = document.fullscreenElement === box ? full : small;
+      if (video.getAttribute('src') === want) return;
+      const t = video.currentTime; const wasPlaying = !video.paused;
+      video.src = want;
+      video.addEventListener('loadedmetadata', () => { video.currentTime = t; if (wasPlaying) video.play().catch(() => {}); }, { once: true });
+    };
+    document.addEventListener('fullscreenchange', onFs);
     sync();
     if (video.readyState >= 1) onMeta();
 
@@ -79,6 +100,8 @@ export default function Player({ src, poster, caption, ratio }) {
       video.removeEventListener('timeupdate', onTime);
       track.removeEventListener('pointerdown', onDown);
       if (st) st.kill();
+      io.disconnect();
+      document.removeEventListener('fullscreenchange', onFs);
       video.pause();
     };
   }, []);
@@ -112,12 +135,12 @@ export default function Player({ src, poster, caption, ratio }) {
     <div className={cls} ref={boxRef} style={{ '--ratio': ratio }}>
       <video
         ref={videoRef}
-        src={file}
+        src={near ? small : undefined}
         poster={poster || undefined}
         muted
         loop
         playsInline
-        preload="metadata"
+        preload={near ? 'auto' : 'none'}
         aria-label={caption || 'Vídeo do projeto'}
         onClick={toggle}
       />

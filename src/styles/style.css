@@ -989,7 +989,7 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 /* Player de vídeo próprio (blocos { type: 'video' }) */
 .player { --frame: 0px; }
 .player:fullscreen { background: #000; aspect-ratio: auto; }
-.player video { cursor: pointer; }
+.player video { cursor: pointer; transform: translateZ(0); } /* camada própria: os cantos arredondados não repintam a cada quadro */
 .player__big {
   position: absolute; left: 50%; top: 50%; width: 96px; height: 96px; margin: -48px 0 0 -48px;
   border-radius: 50%; background: var(--paper); color: var(--navy);
@@ -1032,7 +1032,7 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 
 .js .img-reveal { clip-path: inset(0 0 100% 0); }
 .js .img-reveal.is-revealed { clip-path: none; }
-.js .img-reveal:not(.is-revealed) .plate > img, .js .img-reveal:not(.is-revealed) .plate > video { transform: scale(1.06); }
+.js .img-reveal:not(.is-revealed) .plate > img { transform: scale(1.06); }
 .js .blk--detail.img-reveal:not(.is-revealed) .plate > img { transform: scale(calc(var(--zoom, 1.5) * 1.06)); }
 
 .project__next { border-top: 1px solid var(--line); }
