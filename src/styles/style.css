@@ -644,16 +644,35 @@ input, textarea { font: inherit; color: inherit; }
 }
 .exp__item p { color: var(--mute); max-width: 40ch; font-size: var(--fs-body); line-height: 1.5; }
 
-/* ---------- 8b. FAIXA (marquee) ---------- */
-.marquee { background: var(--blue); color: var(--white); overflow: hidden; padding-block: clamp(16px, 1.8vw, 26px); }
-.marquee__track { display: flex; width: max-content; will-change: transform; }
-.marquee__group { display: flex; flex: none; }
-.marquee__group > span {
-  display: inline-flex; align-items: center; white-space: nowrap;
-  font-family: var(--font-display); font-weight: 500; text-transform: uppercase;
-  font-size: clamp(2rem, 1.3rem + 3.4vw, 4.75rem); letter-spacing: -0.045em; line-height: 1;
+/* ---------- 8b. CITAÇÃO ---------- */
+/* Frase de referência entre Experiência e Projetos. O texto usa o reveal em
+   caixa (estilo skiper70): uma caixa azul cobre cada palavra e se recolhe
+   deixando a palavra — guiado pela rolagem (home-motion.js → quoteMotion). */
+.quote { position: relative; padding-block: clamp(96px, 12vw, 180px); overflow: hidden; }
+/* No desktop a seção fica fixa durante a frase: ocupa a tela e centraliza */
+@media (min-width: 861px) { .quote { min-height: 100vh; min-height: 100svh; display: flex; align-items: center; padding-block: 96px; } .quote__in { width: 100%; } }
+.quote__in { position: relative; display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); column-gap: var(--gap); align-items: end; }
+.quote__mark {
+  position: absolute; left: -0.06em; top: -0.42em; z-index: -1;
+  font: italic 400 clamp(12rem, 6rem + 22vw, 30rem)/1 var(--font-serif); color: var(--blue); opacity: 0.14;
+  pointer-events: none; user-select: none;
 }
-.marquee i { font-style: normal; font-size: 0.42em; color: var(--ice); margin-inline: 0.7em; }
+.quote__fig { grid-column: 1 / 12; position: relative; z-index: 1; margin: 0; }
+.quote__eyebrow { display: block; margin-bottom: clamp(20px, 2.5vw, 36px); }
+.quote__text {
+  margin: 0; font-family: var(--font-display); font-weight: 500; text-transform: uppercase;
+  font-size: clamp(2.5rem, 0.9rem + 6.4vw, 7.25rem); line-height: 0.98; letter-spacing: -0.045em; text-wrap: balance;
+}
+.quote__text em { font-family: var(--font-serif); font-style: italic; font-weight: 400; text-transform: none; letter-spacing: -0.02em; color: var(--blue); }
+.quote__by {
+  margin-top: clamp(32px, 4vw, 56px); padding-top: 18px; border-top: 1px solid var(--line);
+  display: flex; justify-content: space-between; align-items: baseline; gap: 16px; flex-wrap: wrap;
+}
+.quote__by .label:last-child { text-transform: none; letter-spacing: 0.02em; }
+/* palavras do reveal em caixa */
+.bw { position: relative; display: inline-block; }
+.bw__box { position: absolute; left: -0.04em; right: -0.04em; top: 0.1em; bottom: 0.02em; background: var(--blue); transform: scaleX(0); transform-origin: left center; }
+.js .bw__t { opacity: 0; }
 
 /* ---------- 9. PROJETOS ---------- */
 .work__heading { margin-bottom: var(--block-y); }
@@ -831,20 +850,26 @@ input, textarea { font: inherit; color: inherit; }
   display: grid; place-items: center; pointer-events: none; will-change: transform;
 }
 /* Sai para cima (só transform, sem repintar a tela) puxando uma faixa azul */
+/* Sai para cima (só transform, sem repintar a tela) puxando uma faixa azul */
 .preloader::after { content: ""; position: absolute; left: 0; right: 0; top: 100%; height: 12vh; background: var(--blue); border-radius: 0 0 40px 40px; }
-.preloader__bar { position: absolute; left: var(--gutter); right: var(--gutter); bottom: 24px; height: 1px; background: rgba(242, 244, 247, 0.14); }
-.preloader__bar i { position: absolute; inset: 0; background: var(--blue); transform-origin: left; transform: scaleX(0); }
 /* Monograma GL dentro de um quadrado arredondado que se desenha */
 .preloader__mark { position: relative; width: clamp(96px, 12vw, 132px); aspect-ratio: 1; display: grid; place-items: center; }
 .preloader__ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
-.preloader__ring rect { fill: none; stroke: var(--blue); stroke-width: 2; stroke-dasharray: 1; stroke-dashoffset: 1; vector-effect: non-scaling-stroke; }
+.preloader__ring rect { fill: none; stroke: var(--blue-hi); stroke-width: 2; stroke-linecap: round; stroke-dasharray: 0.22 0.78; vector-effect: non-scaling-stroke; }
+/* trilho fixo por baixo do arco */
+.preloader__mark::before { content: ""; position: absolute; inset: 0; border-radius: 30px; border: 1px solid rgba(242, 244, 247, 0.1); }
 .preloader__glyph {
   display: flex; align-items: baseline; overflow: hidden; padding: 0.1em 0.06em;
   font-family: var(--font-display); font-weight: 500; font-size: clamp(2.5rem, 5vw, 3.5rem); letter-spacing: -0.06em; line-height: 1;
 }
 .preloader__glyph > span { display: block; }
 .preloader__glyph .serif { color: var(--ice); font-size: 1.08em; margin-left: -0.04em; }
-.preloader__count { position: absolute; right: var(--gutter); bottom: 40px; color: rgba(242, 244, 247, 0.6); font-variant-numeric: tabular-nums; }
+.preloader__label { position: absolute; left: var(--gutter); bottom: 40px; color: rgba(242, 244, 247, 0.6); opacity: 0; }
+/* reticências que acendem em sequência */
+.preloader__dots i { font-style: normal; opacity: 0.25; animation: pre-dot 1.2s ease-in-out infinite; }
+.preloader__dots i:nth-child(2) { animation-delay: 0.2s; }
+.preloader__dots i:nth-child(3) { animation-delay: 0.4s; }
+@keyframes pre-dot { 40% { opacity: 1; } }
 html:not(.js) .preloader, html:not(.js) .curtain { display: none; }
 .js [data-reveal] { opacity: 0; }
 
@@ -1186,6 +1211,9 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
   .js .badge__ring rect { stroke-dashoffset: 0; }
   .roll > span { transition: none; }
   .service::after { display: none; }
+  .js .bw__t { opacity: 1 !important; }
+  .bw__box { display: none; }
+  .preloader__dots i { animation: none; opacity: 1; }
   .frame__c, .frame__tag { transform: none !important; opacity: 1 !important; }
   .hero__status i { animation: none; }
 }

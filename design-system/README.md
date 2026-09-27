@@ -102,14 +102,14 @@ Escala (fluida com `clamp`; valores em 1440 px):
 - **Números com gráficos** (`StatCharts.jsx`): 4 cards em `--plate`, cada um com legenda, número que conta, mini-gráfico e linha de leitura que responde a hover/foco/toque. Dados calculados de `projects.js` (nada inventado): unidades por projeto (hover = cor da marca), linha do tempo 2021→hoje, anel de projetos por tipo (gaps de 2px), barras de projetos por frente. **Um azul só** — tons de azul como categorias reprovaram no validador (claros demais sobre `--plate`); identidade vem da posição e do rótulo.
 - **Painéis de serviço**: entram em leque (giro de ±3°, stagger), luz que segue o mouse (`--mx/--my`), parallax em ritmos diferentes no desktop.
 - **Retrato**: moldura 4:5 sticky, foto com parallax interno, legenda clara no rodapé e um **selo** que é o monograma da abertura (quadrado marinho, contorno azul que se desenha, "G" + "L" serif em `--ice`), na borda esquerda da foto.
-- **Marquee**: faixa azul, texto branco, ✦ em `--ice`, acelera com o scroll.
+- **Citação** (entre Experiência e Projetos, no lugar do letreiro): "Bom design é *bom negócio.*" — Thomas J. Watson Jr., IBM, 1973 ("Good design is good business."). Display em caixa alta + a parte em serif azul; aspas gigantes em azul a 14% que giram e sobem com a rolagem. Texto com reveal em caixa (estilo skiper70): uma caixa azul cobre cada palavra e se recolhe deixando-a acesa. No desktop a seção fica fixa (pin, +110% de rolagem) enquanto a frase se monta; no celular, sem pin.
 - **Campo** `.field`: só fio inferior; legenda mono que sobe no foco.
 
 ## 5. Motion
 
 Easing: `--ease` `cubic-bezier(.16,1,.3,1)` (expo.out) para entradas; `--ease-io` `cubic-bezier(.76,0,.24,1)` para cortinas. Durações: 0.35 s (hover), 0.7 s (estado), 0.9–1.3 s (entrada).
 
-- **Preloader**: espera as fontes (máx. 1,2 s) → contorno azul do monograma se desenha + contador 000–100 + barra → a página monta *com a tela coberta* → sai para cima só com `transform`, puxando uma faixa azul.
+- **Abertura**: pausa proposital de ~0,55 s com a tela parada → o "GL" sobe e um arco azul (22% do contorno) dá voltas no quadrado como indicador de carregamento, com "Carregando..." em mono → após no mínimo 2,3 s (e as fontes prontas) o arco fecha o contorno, o monograma pulsa, a página monta ainda coberta e a tela sobe só com transform. Sem barra nem contador.
 - **Hero**: letras do nome sobem uma a uma com giro de 8° que assenta; "Lenzi" alinhado à direita.
 - **Scroll**: linhas de título em máscara, fade-up nos blocos, palavras que acendem no "Sobre", números que contam, legendas que decodificam, parallax leve nas pranchas e no retrato.
 - **Rotas**: cortina líquida com faixa azul na borda.

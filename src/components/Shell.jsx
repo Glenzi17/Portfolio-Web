@@ -58,35 +58,40 @@ export default function Shell({ children }) {
   useEffect(() => {
     if (reduced || SEEN) { setReady(true); return undefined; }
     const pre = preRef.current;
-    const count = pre.querySelector('.preloader__count');
-    const bar = pre.querySelector('.preloader__bar i');
     const ring = pre.querySelector('.preloader__ring rect');
     const glyphs = pre.querySelectorAll('.preloader__glyph > span');
     const mark = pre.querySelector('.preloader__mark');
-    const n = { v: 0 };
+    const label = pre.querySelector('.preloader__label');
     if (lenis) lenis.stop();
     gsap.set(glyphs, { yPercent: 110 });
-    let tl = null;
+    // Arco de carregamento: um trecho do contorno (22%) dá voltas no quadrado
+    gsap.set(ring, { strokeDasharray: '0.22 0.78', strokeDashoffset: 0, opacity: 0 });
+    let spin = null, intro = null, tl = null;
     let alive = true;
-    // Espera as fontes (no máx. 0,5 s — agora vêm do próprio site): antes o "GL"
-    // trocava de fonte no meio da animação e o monograma dava um pulo.
+    // 1) pausa proposital com a tela parada; 2) o GL sobe e o arco começa a girar
+    intro = gsap.timeline({ delay: 0.55 })
+      .to(ring, { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0)
+      .add(() => { spin = gsap.to(ring, { strokeDashoffset: '-=1', duration: 1.15, ease: 'none', repeat: -1 }); }, 0)
+      .to(glyphs, { yPercent: 0, duration: 0.8, stagger: 0.08, ease: 'expo.out' }, 0.1)
+      .to(label, { opacity: 1, duration: 0.5 }, 0.2);
+    // 3) terminou quando as fontes estão prontas e já passou o tempo mínimo
     const fonts = document.fonts ? document.fonts.ready : Promise.resolve();
-    Promise.race([fonts, new Promise((r) => setTimeout(r, 500))]).then(() => {
+    const minTime = new Promise((r) => setTimeout(r, 2300));
+    Promise.all([Promise.race([fonts, new Promise((r) => setTimeout(r, 1500))]), minTime]).then(() => {
       if (!alive) return;
-      // O contorno se desenha junto com a contagem e a barra; as letras sobem
-      // pela máscara. Com a tela ainda coberta a página monta (setReady) —
-      // o trabalho pesado acontece escondido, e a saída (só transform) fica lisa.
+      if (spin) spin.kill();
+      // O arco fecha o contorno ("carregado"), o monograma pulsa e a página monta
+      // com a tela ainda coberta; a saída é só transform, lisa.
       tl = gsap.timeline({ onComplete: () => { setPreloading(false); if (lenis) lenis.start(); } })
-        .to(n, { v: 100, duration: 0.8, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(n.v)).padStart(3, '0'); } })
-        .to(ring, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
-        .to(bar, { scaleX: 1, duration: 0.8, ease: 'power2.inOut' }, 0)
-        .to(glyphs, { yPercent: 0, duration: 0.7, stagger: 0.07, ease: 'expo.out' }, 0.1)
+        .to(ring, { strokeDasharray: '1 0', duration: 0.55, ease: 'power2.inOut' })
+        .to(label, { opacity: 0, duration: 0.3 }, 0)
+        .to(mark, { scale: 1.06, duration: 0.25, ease: 'power2.out', yoyo: true, repeat: 1 }, 0.45)
         .add(() => setReady(true))
         .to(glyphs, { yPercent: -110, duration: 0.4, stagger: 0.05, ease: 'power3.in' }, '+=0.05')
-        .to([mark, count, bar.parentNode], { opacity: 0, duration: 0.3, ease: 'power2.in' }, '<0.05')
+        .to(mark, { opacity: 0, duration: 0.3, ease: 'power2.in' }, '<0.05')
         .to(pre, { yPercent: -112, duration: 0.85, ease: EASE_IO }, '-=0.1');
     });
-    return () => { alive = false; if (tl) tl.kill(); };
+    return () => { alive = false; [intro, spin, tl].forEach((t) => t && t.kill()); };
   }, []);
 
 
@@ -168,8 +173,7 @@ export default function Shell({ children }) {
             <svg className="preloader__ring" viewBox="0 0 120 120"><rect x="1" y="1" width="118" height="118" rx="30" pathLength="1" /></svg>
             <span className="preloader__glyph"><span>G</span><span className="serif">L</span></span>
           </div>
-          <div className="preloader__count label">000</div>
-          <div className="preloader__bar"><i /></div>
+          <div className="preloader__label label">Carregando<span className="preloader__dots"><i>.</i><i>.</i><i>.</i></span></div>
         </div>
       )}
       {!reduced && (

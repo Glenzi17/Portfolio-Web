@@ -284,22 +284,54 @@ export const countUp = (scope) => {
   });
 };
 
-/* ---------- Faixa em loop que reage ao scroll (.marquee) ---------- */
-// Anda sozinha; rolar a página acelera e inverte o sentido junto com o scroll.
-export const marquee = (scope) => {
-  const band = scope.querySelector('.marquee');
-  if (!band || reduced) return;
-  const loop = gsap.to(band.querySelector('.marquee__track'), { xPercent: -50, duration: 32, ease: 'none', repeat: -1 });
-  loop.totalTime(loop.duration() * 200); // folga para tocar ao contrário sem parar no início
-  let dir = 1;
-  ScrollTrigger.create({
-    trigger: band, start: 'top bottom', end: 'bottom top',
-    onUpdate: (self) => {
-      dir = self.direction;
-      const boost = gsap.utils.clamp(1, 6, Math.abs(self.getVelocity()) / 250);
-      gsap.timeline({ overwrite: true })
-        .to(loop, { timeScale: dir * boost, duration: 0.2, ease: 'power1.out' })
-        .to(loop, { timeScale: dir, duration: 1.2, ease: 'power2.out' });
-    },
+/* ---------- Citação: reveal em caixa palavra a palavra (estilo skiper70) ---------- */
+// Cada palavra ganha uma caixa azul: ela cresce da esquerda cobrindo a palavra,
+// a palavra acende por baixo e a caixa se recolhe para a direita. No desktop a
+// seção fica fixa (pin) enquanto a rolagem conduz a frase; no celular, sem pin.
+const splitBoxes = (p) => {
+  const out = [];
+  const wrap = (word, italic) => {
+    const w = document.createElement('span'); w.className = 'bw';
+    const t = document.createElement(italic ? 'em' : 'span'); t.className = 'bw__t'; t.textContent = word;
+    const b = document.createElement('i'); b.className = 'bw__box'; b.setAttribute('aria-hidden', 'true');
+    w.append(t, b); out.push(w); return w;
+  };
+  const frag = document.createDocumentFragment();
+  [...p.childNodes].forEach((node) => {
+    const italic = node.nodeType === 1 && node.tagName === 'EM';
+    const words = node.textContent.split(/\s+/).filter(Boolean);
+    words.forEach((word, i) => { frag.append(wrap(word, italic)); frag.append(' '); });
   });
+  p.setAttribute('aria-label', p.textContent.trim());
+  p.textContent = '';
+  p.append(frag);
+  return out;
+};
+
+export const quoteMotion = (scope) => {
+  const sec = scope.querySelector('.quote');
+  const p = sec && sec.querySelector('[data-boxreveal]');
+  if (!p || reduced) return;
+  const words = splitBoxes(p);
+  const mark = sec.querySelector('.quote__mark');
+  const by = sec.querySelectorAll('.quote__by .label, .quote__eyebrow');
+  const desktop = window.matchMedia('(min-width: 861px)').matches;
+  const tl = gsap.timeline({
+    defaults: { ease: 'power3.inOut' },
+    scrollTrigger: desktop
+      ? { trigger: sec, start: 'top top', end: '+=110%', pin: true, scrub: 0.6, anticipatePin: 1 }
+      : { trigger: p, start: 'top 80%', end: 'bottom 45%', scrub: 0.6 },
+  });
+  tl.fromTo(mark, { yPercent: 30, rotate: -14, scale: 0.8 }, { yPercent: 0, rotate: 0, scale: 1, duration: words.length * 0.35 + 0.6, ease: 'none' }, 0);
+  tl.fromTo(by[0], { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.3 }, 0);
+  words.forEach((w, i) => {
+    const t = w.querySelector('.bw__t'); const b = w.querySelector('.bw__box');
+    const at = 0.15 + i * 0.35;
+    tl.set(b, { transformOrigin: 'left center' }, at)
+      .to(b, { scaleX: 1, duration: 0.3 }, at)
+      .set(t, { opacity: 1 }, at + 0.3)
+      .set(b, { transformOrigin: 'right center' }, at + 0.3)
+      .to(b, { scaleX: 0, duration: 0.3 }, at + 0.3);
+  });
+  tl.fromTo([...by].slice(1), { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1 }, '-=0.1');
 };

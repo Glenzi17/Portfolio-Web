@@ -27,13 +27,13 @@
     #boot { display: none; }
     .boot #boot { display: block; position: fixed; inset: 0; z-index: 700; background: #0c1422; }
     #boot span {
-      position: absolute; right: clamp(20px, 4.5vw, 72px); bottom: 40px;
+      position: absolute; left: clamp(20px, 4.5vw, 72px); bottom: 40px; text-transform: uppercase;
       font: 500 11px/1.4 ui-monospace, "SFMono-Regular", Menlo, monospace; letter-spacing: 0.06em; color: rgba(242, 244, 247, 0.6);
     }
   </style>
 </head>
 <body>
-  <div id="boot" aria-hidden="true"><span>000</span></div>
+  <div id="boot" aria-hidden="true"><span>Carregando</span></div>
   <div id="root"></div>
   <noscript><p style="padding:24px;font-family:system-ui">Este portfólio precisa de JavaScript para funcionar.</p></noscript>
   <script type="module" src="/src/main.jsx"></script>

@@ -6,7 +6,7 @@ import { SITE, PROJECTS } from '../data/projects.js';
 import { ratioOf, pad2, srcsetOf } from '../lib/media.js';
 import { usePageMotion } from '../lib/usePageMotion.js';
 import { initReveals, initDarkNav } from '../lib/reveals.js';
-import { heroIntro, revealWork, initTimeline, initActiveNav, contactEnter, wordFill, countUp, marquee, scramble, portrait, servicesMotion, statCharts } from './home-motion.js';
+import { heroIntro, revealWork, initTimeline, initActiveNav, contactEnter, wordFill, countUp, quoteMotion, scramble, portrait, servicesMotion, statCharts } from './home-motion.js';
 import { useShell } from '../components/ShellContext.js';
 import Plate from '../components/Plate.jsx';
 import Roll from '../components/Roll.jsx';
@@ -30,7 +30,6 @@ const EXPERIENCE = [
   { year: '2026', title: 'Hoje', text: 'Sempre evoluindo.' },
 ];
 
-const MARQUEE = ['Branding', 'Campanhas', 'Direção de arte', 'Key visual', 'Digital', 'Identidade visual'];
 
 const SERVICES = [
   { title: 'Identidade visual', tags: 'Branding / Papelaria', tone: 'plain', text: 'Marcas, logotipos e sistemas visuais consistentes, do cartão de visita ao digital.' },
@@ -97,6 +96,7 @@ export default function Home() {
 
   usePageMotion(ready, scope, (el) => {
     heroIntro(el);
+    quoteMotion(el); // antes dos outros gatilhos: ela fixa a tela (pin) e empurra o que vem depois
     initReveals(el);
     revealWork(el);
     initTimeline(el);
@@ -104,7 +104,6 @@ export default function Home() {
     contactEnter(el);
     wordFill(el);
     countUp(el);
-    marquee(el);
     scramble(el);
     portrait(el);
     servicesMotion(el);
@@ -254,16 +253,22 @@ export default function Home() {
           </div>
         </section>
 
-        {/* Faixa com as frentes de trabalho: anda sozinha e acelera com o scroll */}
-        <div className="marquee" aria-hidden="true" data-dark>
-          <div className="marquee__track">
-            {[0, 1].map((k) => (
-              <span className="marquee__group" key={k}>
-                {MARQUEE.map((w) => <span key={w}>{w}<i>✦</i></span>)}
-              </span>
-            ))}
+        {/* ======================= CITAÇÃO ======================= */}
+        <section className="quote" id="manifesto" aria-label="Citação" data-pill="Manifesto">
+          <div className="container quote__in">
+            <figure className="quote__fig">
+              <span className="quote__mark" aria-hidden="true">“</span>
+              <span className="label quote__eyebrow">Design &amp; negócio</span>
+              <blockquote className="quote__text" cite="https://www.ibm.com/design/">
+                <p data-boxreveal>Bom design é <em>bom negócio.</em></p>
+              </blockquote>
+              <figcaption className="quote__by" data-line="top">
+                <span className="label label--ink">Thomas J. Watson Jr. · IBM</span>
+                <span className="label">“Good design is good business.” — 1973</span>
+              </figcaption>
+            </figure>
           </div>
-        </div>
+        </section>
 
         {/* ======================= 03 PROJETOS ======================= */}
         <section className="section container" id="projetos" data-pill="Projetos">
