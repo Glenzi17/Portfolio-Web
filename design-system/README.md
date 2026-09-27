@@ -38,7 +38,7 @@ Rampa do shader líquido (`Fluid.jsx`), só dentro das superfícies líquidas:
 - Não reintroduzir laranja/lima. `--accent`, `--ocean` e `--lime` antigos agora apontam para o azul.
 
 ### Tema noturno
-`ThemeToggle.jsx` (na cápsula da direita da nav) alterna `data-theme="dark"` no `<html>`; a escolha fica em `localStorage` (`gl-theme`) e, sem escolha, segue o sistema — o script do `index.html` aplica antes da primeira pintura. A troca revela o tema novo num círculo que cresce a partir do botão (View Transitions API; instantânea sem a API ou com movimento reduzido).
+`ThemeToggle.jsx` (na cápsula da direita da nav) alterna `data-theme="dark"` no `<html>`; a escolha fica em `localStorage` (`gl-theme`) e, sem escolha, o site abre **claro** — o script do `index.html` aplica antes da primeira pintura. A troca revela o tema novo num círculo que cresce a partir do botão (View Transitions API; instantânea sem a API ou com movimento reduzido).
 
 | Token | Claro | Noturno |
 |---|---|---|

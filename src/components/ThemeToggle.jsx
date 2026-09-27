@@ -9,7 +9,7 @@ import { reduced } from '../lib/motion.js';
    ::view-transition-new). O ícone é um disco meio cheio que
    gira meia volta a cada troca. Sem a API, ou com movimento
    reduzido, a troca é instantânea. A escolha fica salva em
-   localStorage ('gl-theme'); sem escolha, segue o sistema
+   localStorage ('gl-theme'); sem escolha, o site abre claro
    (o script do index.html aplica antes da primeira pintura).
    ========================================================= */
 
