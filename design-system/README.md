@@ -37,6 +37,20 @@ Rampa do shader líquido (`Fluid.jsx`), só dentro das superfícies líquidas:
 - Texto sobre superfície líquida precisa de véu marinho (`.contact::after`, 15% → 78%) e legendas a 86% de branco; o shader sozinho não garante leitura.
 - Não reintroduzir laranja/lima. `--accent`, `--ocean` e `--lime` antigos agora apontam para o azul.
 
+### Tema noturno
+`ThemeToggle.jsx` (na cápsula da direita da nav) alterna `data-theme="dark"` no `<html>`; a escolha fica em `localStorage` (`gl-theme`) e, sem escolha, segue o sistema — o script do `index.html` aplica antes da primeira pintura. A troca revela o tema novo num círculo que cresce a partir do botão (View Transitions API; instantânea sem a API ou com movimento reduzido).
+
+| Token | Claro | Noturno |
+|---|---|---|
+| `--bg` | `#f2f4f7` | `#0a0f18` |
+| `--ink` | `#0c1422` | `#e8ecf2` |
+| `--plate` | `#e5e9ef` | `#131c2b` |
+| `--mute` | `#5d6980` | `#8e99ae` |
+| `--blue` | `#1660ab` | `#3b86d9` (um passo mais claro para manter contraste) |
+| `--surface` | `#ffffff` | `#1b2638` |
+
+Superfícies que **não** mudam com o tema usam `--navy` (`#0c1422`) e `--paper` (`#f2f4f7`): contato, rodapé, abertura, cortina, painel tinta, mockups de celular, controles do player e legenda sobre a foto. Regra: fundo escuro de propósito → `--navy`/`--paper`; o resto → `--bg`/`--ink`.
+
 ## 2. Tipografia
 
 | Papel | Família | Token |

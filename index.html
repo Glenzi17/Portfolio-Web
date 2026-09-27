@@ -13,6 +13,12 @@
 
   <script>
     document.documentElement.classList.add('js');
+    // Tema salvo (ThemeToggle) ou o do sistema — aplicado antes de pintar, sem piscar
+    try {
+      var t = localStorage.getItem('gl-theme') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = t;
+      if (t === 'dark') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0a0f18');
+    } catch (e) {}
     // Primeira visita da sessão: o fundo da abertura já sai no HTML, sem esperar o JS
     try {
       if (sessionStorage.getItem('gl-seen') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches)

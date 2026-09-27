@@ -22,6 +22,16 @@
   --blue-hi: #2a78d0;           /* hover / brilho do azul sobre claro */
   --ice: #a9d1ff;               /* destaque do azul sobre fundos escuros */
   --accent: var(--blue);
+  /* Superfícies que NÃO mudam com o tema (contato, rodapé, abertura, mockups) */
+  --paper: #f2f4f7;
+  --navy: #0c1422;
+  /* Superfícies que mudam com o tema */
+  --surface: #ffffff;                    /* pílula ativa da nav, janela do navegador */
+  --glass: rgba(242, 244, 247, 0.74);    /* cápsulas da nav */
+  --glass-solid: rgba(242, 244, 247, 0.96);
+  --glass-hi: rgba(255, 255, 255, 0.7);  /* brilho da borda de cima das cápsulas */
+  --hover: rgba(12, 20, 34, 0.06);
+  color-scheme: light;
   --ocean: var(--blue);
   --ocean-deep: #0c1422;
   --aqua: #57beaf;
@@ -58,6 +68,26 @@
   --fs-lead: clamp(1.0625rem, 0.98rem + 0.35vw, 1.3125rem);
   --fs-h2: clamp(2rem, 1.35rem + 2.7vw, 4rem);
   --fs-h1: clamp(2.75rem, 0.9rem + 9vw, 9.5rem);
+}
+
+/* Tema noturno (ThemeToggle.jsx grava data-theme no <html>; o script do
+   index.html aplica antes da primeira pintura). Só os tokens mudam. */
+:root[data-theme="dark"] {
+  --bg: #0a0f18;
+  --ink: #e8ecf2;
+  --plate: #131c2b;
+  --plate-dark: #0d1522;
+  --mute: #8e99ae;
+  --line: rgba(232, 236, 242, 0.12);
+  --line-strong: rgba(232, 236, 242, 0.28);
+  --blue: #3b86d9;                       /* o azul clareia um passo para manter contraste no escuro */
+  --blue-hi: #5a9be6;
+  --surface: #1b2638;
+  --glass: rgba(10, 15, 24, 0.72);
+  --glass-solid: rgba(10, 15, 24, 0.96);
+  --glass-hi: rgba(255, 255, 255, 0.06);
+  --hover: rgba(232, 236, 242, 0.08);
+  color-scheme: dark;
 }
 
 /* ---------- 2. BASE ---------- */
@@ -212,12 +242,12 @@ input, textarea { font: inherit; color: inherit; }
 .js .nav { opacity: 0; } /* entra com o conteúdo (Nav.jsx) */
 .nav__caps {
   display: flex; align-items: center; height: 46px; padding: 4px; border-radius: 999px;
-  background: rgba(242, 244, 247, 0.74); border: 1px solid var(--line);
+  background: var(--glass); border: 1px solid var(--line);
   -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  box-shadow: inset 0 1px 0 var(--glass-hi);
   transition: background-color var(--t) var(--ease), border-color var(--t) var(--ease), box-shadow var(--t) var(--ease), color var(--t) var(--ease);
 }
-.nav.is-scrolled .nav__caps { box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.7), 0 12px 28px -18px rgba(12, 20, 34, 0.45); }
+.nav.is-scrolled .nav__caps { box-shadow: inset 0 1px 0 var(--glass-hi), 0 12px 28px -18px rgba(12, 20, 34, 0.45); }
 .nav__links { grid-column: 1; justify-self: start; gap: 2px; }
 .nav__side { grid-column: 3; justify-self: end; gap: 4px; }
 .nav__link, .nav__home {
@@ -226,9 +256,25 @@ input, textarea { font: inherit; color: inherit; }
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease);
 }
 .nav__link em { font-style: normal; color: var(--mute); transition: color var(--t-fast); }
-.nav__link.is-active { background: var(--white); box-shadow: 0 1px 0 var(--line); }
+.nav__link.is-active { background: var(--surface); box-shadow: 0 1px 0 var(--line); }
 .nav__link.is-active em { color: var(--blue); }
-@media (hover: hover) { .nav__link:not(.is-active):hover, .nav__home:hover { background: rgba(12, 20, 34, 0.06); } }
+@media (hover: hover) { .nav__link:not(.is-active):hover, .nav__home:hover { background: var(--hover); } }
+
+/* Troca de tema (ThemeToggle.jsx): disco meio cheio que gira meia volta */
+.theme {
+  width: 36px; height: 36px; border-radius: 50%; flex: none; display: grid; place-items: center;
+  color: var(--ink); transition: background-color var(--t-fast) var(--ease);
+}
+.theme svg { width: 18px; height: 18px; transition: transform 0.7s var(--ease); }
+.theme circle { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.theme path { fill: currentColor; }
+.theme.is-dark svg { transform: rotate(180deg); }
+@media (hover: hover) { .theme:hover { background: var(--hover); } }
+.nav.is-dark .theme { color: var(--paper); }
+@media (hover: hover) { .nav.is-dark .theme:hover { background: rgba(242, 244, 247, 0.1); } }
+/* A revelação em círculo: as duas capturas ficam paradas e só a nova é recortada */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; mix-blend-mode: normal; }
+::view-transition-new(root) { z-index: 2; }
 
 /* Centro: monograma com anel; abre para o nome no fim da página e para "Topo" no hover */
 .nav__mark {
@@ -261,15 +307,20 @@ input, textarea { font: inherit; color: inherit; }
 .nav__mark:focus-visible .nav__mark-open { grid-template-columns: 1fr; }
 .nav__mark:focus-visible { outline-offset: 4px; }
 
+/* Tema noturno: o círculo do monograma fica claro, então o L e o trilho do anel escurecem */
+:root[data-theme="dark"] .nav__mark-gl em { color: var(--blue); }
+:root[data-theme="dark"] .nav__mark-track { stroke: rgba(12, 20, 34, 0.14); }
+:root[data-theme="dark"] .nav__mark-fill { stroke: var(--blue); }
+
 /* Sobre seções escuras ([data-dark]) as cápsulas escurecem e o centro clareia */
-.nav.is-dark .nav__caps { background: rgba(12, 20, 34, 0.66); border-color: rgba(242, 244, 247, 0.14); color: var(--bg); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); }
+.nav.is-dark .nav__caps { background: rgba(12, 20, 34, 0.66); border-color: rgba(242, 244, 247, 0.14); color: var(--paper); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06); }
 .nav.is-dark .nav__link em { color: rgba(242, 244, 247, 0.5); }
 .nav.is-dark .nav__link.is-active { background: rgba(242, 244, 247, 0.12); box-shadow: none; }
 .nav.is-dark .nav__link.is-active em { color: var(--ice); }
 @media (hover: hover) { .nav.is-dark .nav__link:not(.is-active):hover, .nav.is-dark .nav__home:hover { background: rgba(242, 244, 247, 0.1); } }
-.nav.is-dark .btn { --btn-bg: var(--bg); --btn-fg: var(--ink); }
-.nav.is-dark .nav__toggle span { background: var(--bg); }
-.nav.is-dark .nav__mark { background: var(--bg); color: var(--ink); }
+.nav.is-dark .btn { --btn-bg: var(--paper); --btn-fg: var(--navy); }
+.nav.is-dark .nav__toggle span { background: var(--paper); }
+.nav.is-dark .nav__mark { background: var(--paper); color: var(--navy); }
 .nav.is-dark .nav__mark-gl em { color: var(--blue); }
 .nav.is-dark .nav__mark-track { stroke: rgba(12, 20, 34, 0.14); }
 .nav.is-dark .nav__mark-fill { stroke: var(--blue); }
@@ -380,7 +431,7 @@ input, textarea { font: inherit; color: inherit; }
   display: grid; place-items: center;
 }
 .about__frame img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
-.about__frame--mono { color: var(--bg); }
+.about__frame--mono { color: var(--paper); }
 .about__frame--mono .serif { color: var(--ice); }
 /* Retrato: a foto fica um pouco maior que a moldura para o parallax
    interno não mostrar borda; legenda e selo giratório por cima. */
@@ -390,16 +441,17 @@ input, textarea { font: inherit; color: inherit; }
   position: absolute; left: 12px; right: 12px; bottom: 12px; z-index: 1;
   display: flex; justify-content: space-between; align-items: center; gap: 12px;
   padding: 10px 14px; border-radius: 8px;
-  background: rgba(242, 244, 247, 0.92); color: var(--ink);
+  background: rgba(242, 244, 247, 0.92); color: var(--navy);
 }
-.about__cap .label:first-child { color: var(--ink); }
+.about__cap .label:first-child { color: var(--navy); }
+.about__cap .label { color: #5d6980; }
 .about__cap i { display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--blue); margin-right: 8px; vertical-align: 1px; }
 .about__visual { position: sticky; top: calc(var(--nav-h-small) + 48px); align-self: start; }
 /* Selo = o monograma do preloader: quadrado arredondado marinho, contorno
    azul que se desenha ao entrar (home-motion.js) e "GL" com o L em serif. */
 .badge {
   position: absolute; left: -36px; bottom: 88px; z-index: 2; width: 104px; aspect-ratio: 1;
-  border-radius: 26px; background: var(--ink); color: var(--bg);
+  border-radius: 26px; background: var(--navy); color: var(--paper);
   display: grid; place-items: center;
 }
 .badge__ring { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
@@ -427,8 +479,9 @@ input, textarea { font: inherit; color: inherit; }
   min-height: clamp(240px, 26vw, 340px); padding: clamp(22px, 2.2vw, 32px);
   border-radius: var(--radius); background: var(--plate);
 }
-.service--ink { background: var(--ink); color: var(--bg); --mute: rgba(242, 244, 247, 0.6); }
-.service--ocean { color: var(--bg); --mute: rgba(242, 244, 247, 0.88); }
+.service--ink { background: var(--navy); color: var(--paper); --mute: rgba(242, 244, 247, 0.6); }
+:root[data-theme="dark"] .service--ink { box-shadow: inset 0 0 0 1px var(--line); }
+.service--ocean { color: var(--paper); --mute: rgba(242, 244, 247, 0.88); }
 /* Véu marinho entre o shader e o texto: os trechos claros do líquido (água,
    brilho mentolado) deixavam o texto branco ilegível, sobretudo no celular.
    O canvas desce uma camada para o véu ficar entre ele e o conteúdo. */
@@ -632,12 +685,12 @@ input, textarea { font: inherit; color: inherit; }
 /* ---------- 10. CONTATO ---------- */
 /* Folha escura de cantos arredondados que continua no rodapé */
 .contact {
-  color: var(--bg); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+  color: var(--paper); border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   --line: rgba(242, 244, 247, 0.24); --line-strong: rgba(242, 244, 247, 0.45); --mute: rgba(242, 244, 247, 0.74);
   transform-origin: 50% 0; overflow: hidden; /* os cantos arredondados recortam o shader */
 }
-.contact ::selection { background: var(--bg); color: var(--ink); }
-.contact .label--ink { color: var(--bg); }
+.contact ::selection { background: var(--paper); color: var(--navy); }
+.contact .label--ink { color: var(--paper); }
 /* Véu marinho entre o shader e o conteúdo: mais denso à esquerda e embaixo,
    onde ficam e-mail, telefone e formulário — o líquido segue visível no alto. */
 .contact::after {
@@ -661,13 +714,13 @@ input, textarea { font: inherit; color: inherit; }
 .contact__social { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
 .contact__social a {
   display: inline-flex; align-items: center; gap: 10px; padding: 10px 16px; border-radius: 999px;
-  border: 1px solid rgba(242, 244, 247, 0.4); color: var(--bg);
+  border: 1px solid rgba(242, 244, 247, 0.4); color: var(--paper);
   font: 500 var(--fs-label)/1 var(--font-mono); letter-spacing: 0.06em; text-transform: uppercase;
   transition: background-color var(--t-fast) var(--ease), color var(--t-fast) var(--ease), border-color var(--t-fast);
 }
 .contact__social-i { display: inline-block; transition: transform var(--t) var(--ease); }
 @media (hover: hover) {
-  .contact__social a:hover { background: var(--bg); color: var(--ink); border-color: var(--bg); }
+  .contact__social a:hover { background: var(--paper); color: var(--navy); border-color: var(--paper); }
   .contact__social a:hover .contact__social-i { transform: translate(2px, -2px); }
 }
 .contact__big {
@@ -677,7 +730,7 @@ input, textarea { font: inherit; color: inherit; }
   overflow-wrap: anywhere; /* o e-mail não cabe numa linha em telas de 320px */
 }
 .contact__big::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--bg);
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--paper);
   transform: scaleX(0.28); transform-origin: left; opacity: 0.7;
   transition: transform var(--t) var(--ease), opacity var(--t-fast);
 }
@@ -695,23 +748,23 @@ input, textarea { font: inherit; color: inherit; }
   transition: transform var(--t-fast) var(--ease), color var(--t-fast); transform-origin: left;
 }
 .field input:focus + label, .field input:not(:placeholder-shown) + label,
-.field textarea:focus + label, .field textarea:not(:placeholder-shown) + label { transform: translateY(-30px); color: var(--bg); }
+.field textarea:focus + label, .field textarea:not(:placeholder-shown) + label { transform: translateY(-30px); color: var(--paper); }
 .field input::placeholder, .field textarea::placeholder { color: transparent; }
 .field::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 8px; height: 1px; background: var(--bg);
+  content: ""; position: absolute; left: 0; right: 0; bottom: 8px; height: 1px; background: var(--paper);
   transform: scaleX(0); transform-origin: left; transition: transform var(--t) var(--ease);
 }
 .field:focus-within::after { transform: scaleX(1); }
 .form__foot { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-top: 32px; flex-wrap: wrap; }
 .form__status { color: var(--mute); }
-.contact .btn { --btn-bg: var(--white); --btn-fg: var(--ink); }
-.contact .btn::before { background: var(--ink); }
+.contact .btn { --btn-bg: var(--white); --btn-fg: var(--navy); }
+.contact .btn::before { background: var(--navy); }
 .contact__title .serif { color: var(--ice); }
 @media (hover: hover) { .contact .btn:hover { color: var(--white); } }
 
 /* ---------- 11. FOOTER ---------- */
 .footer {
-  background: var(--ink); color: var(--bg);
+  background: var(--navy); color: var(--paper);
   --line: rgba(242, 244, 247, 0.16); --mute: rgba(242, 244, 247, 0.55);
   padding: clamp(56px, 7vw, 96px) var(--gutter) 32px; border-top: 1px solid var(--line);
 }
@@ -722,7 +775,7 @@ input, textarea { font: inherit; color: inherit; }
   font-weight: 500; letter-spacing: -0.04em; line-height: 1.02; text-wrap: balance; margin-bottom: 28px;
 }
 .footer__statement .serif { font-size: 1.04em; color: var(--ice); }
-.footer__status { display: inline-flex; align-items: center; gap: 8px; color: var(--bg); }
+.footer__status { display: inline-flex; align-items: center; gap: 8px; color: var(--paper); }
 .footer__status i { width: 6px; height: 6px; border-radius: 50%; background: var(--ice); }
 .footer__col { grid-column: span 2; display: flex; flex-direction: column; gap: 6px; padding-left: 20px; border-left: 1px solid var(--line); min-width: 0; }
 .footer__col:first-of-type { grid-column: 6 / 8; }
@@ -730,7 +783,7 @@ input, textarea { font: inherit; color: inherit; }
 .footer__col .label { margin-bottom: 10px; }
 .footer__col a { width: fit-content; max-width: 100%; position: relative; padding-bottom: 2px; overflow-wrap: anywhere; }
 .footer__col a::after {
-  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--bg);
+  content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 1px; background: var(--paper);
   transform: scaleX(0); transform-origin: right; transition: transform var(--t-fast) var(--ease);
 }
 @media (hover: hover) { .footer__col a:hover::after { transform: scaleX(1); transform-origin: left; } }
@@ -740,10 +793,10 @@ input, textarea { font: inherit; color: inherit; }
 }
 .footer__up {
   width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--line); flex: none;
-  display: grid; place-items: center; font-family: var(--font-mono); color: var(--bg);
+  display: grid; place-items: center; font-family: var(--font-mono); color: var(--paper);
   transition: border-color var(--t-fast), transform var(--t) var(--ease);
 }
-@media (hover: hover) { .footer__up:hover { border-color: var(--bg); transform: translateY(-3px); } }
+@media (hover: hover) { .footer__up:hover { border-color: var(--paper); transform: translateY(-3px); } }
 
 /* ---------- 12. LINKS: texto que rola (Roll.jsx) ---------- */
 /* A cópia vem do text-shadow 1.25em abaixo; no hover o span sobe uma linha. */
@@ -763,9 +816,9 @@ input, textarea { font: inherit; color: inherit; }
 .curtain { position: fixed; inset: 0; z-index: 500; background: var(--fluid-css); transform: translateY(120%); pointer-events: none; will-change: transform; }
 /* faixa azul colada à borda de cima: lidera a entrada e a saída (em repouso fica fora da tela: 120% − 18vh) */
 .curtain::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: 18vh; background: var(--blue); }
-.curtain__label { position: absolute; left: var(--gutter); bottom: 40px; color: var(--bg); opacity: 0; }
+.curtain__label { position: absolute; left: var(--gutter); bottom: 40px; color: var(--paper); opacity: 0; }
 .preloader {
-  position: fixed; inset: 0; z-index: 600; background: var(--ink); color: var(--bg);
+  position: fixed; inset: 0; z-index: 600; background: var(--navy); color: var(--paper);
   display: grid; place-items: center; pointer-events: none; will-change: transform;
 }
 /* Sai para cima (só transform, sem repintar a tela) puxando uma faixa azul */
@@ -910,10 +963,10 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 /* Janela de navegador */
 .device--desktop {
   width: min(100%, calc((var(--stage-h) - 2 * clamp(16px, 3vw, 40px) - 34px) * var(--A)));
-  border-radius: 12px; overflow: hidden; background: var(--white);
+  border-radius: 12px; overflow: hidden; background: var(--surface);
   box-shadow: 0 0 0 1px var(--line), 0 30px 60px -30px rgba(12, 20, 34, 0.35);
 }
-.device__chrome { height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--white); border-bottom: 1px solid var(--line); }
+.device__chrome { height: 34px; display: flex; align-items: center; gap: 6px; padding: 0 12px; background: var(--surface); border-bottom: 1px solid var(--line); }
 .device__chrome i { width: 9px; height: 9px; border-radius: 50%; background: var(--line-strong); }
 .device__chrome span {
   margin-left: 10px; flex: 1; max-width: 360px; height: 20px; border-radius: 6px; background: var(--bg);
@@ -924,11 +977,11 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 .device--mobile {
   --ph: min(720px, calc(var(--stage-h) - 2 * clamp(16px, 3vw, 40px)));
   height: var(--ph); width: calc((var(--ph) - 20px) * var(--A) + 20px);
-  padding: 10px; border-radius: 44px; background: var(--ink);
+  padding: 10px; border-radius: 44px; background: var(--navy);
   box-shadow: 0 30px 60px -28px rgba(12, 20, 34, 0.55);
 }
 .device--mobile .device__screen { height: 100%; border-radius: 34px; }
-.device__island { position: absolute; z-index: 2; left: 50%; top: 20px; width: 84px; height: 24px; margin-left: -42px; border-radius: 999px; background: var(--ink); }
+.device__island { position: absolute; z-index: 2; left: 50%; top: 20px; width: 84px; height: 24px; margin-left: -42px; border-radius: 999px; background: var(--navy); }
 .devices__foot { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-top: 14px; }
 .devices__foot .caption { margin-top: 0; }
 .devices__foot .label { white-space: nowrap; }
@@ -939,7 +992,7 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 .player video { cursor: pointer; }
 .player__big {
   position: absolute; left: 50%; top: 50%; width: 96px; height: 96px; margin: -48px 0 0 -48px;
-  border-radius: 50%; background: var(--bg); color: var(--ink);
+  border-radius: 50%; background: var(--paper); color: var(--navy);
   display: grid; place-items: center; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 500;
   opacity: 0; transform: scale(0.7); pointer-events: none;
   transition: opacity var(--t-fast), transform var(--t) var(--ease);
@@ -949,7 +1002,7 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 .player__bar {
   position: absolute; left: 0; right: 0; bottom: 0; z-index: 1;
   display: flex; flex-wrap: wrap; align-items: center; gap: 0 clamp(12px, 2vw, 22px);
-  padding: 56px 20px 14px; color: var(--bg);
+  padding: 56px 20px 14px; color: var(--paper);
   background: linear-gradient(to top, rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0));
   opacity: 0; transform: translateY(6px);
   transition: opacity var(--t-fast), transform var(--t) var(--ease);
@@ -974,7 +1027,7 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 }
 .player__track:focus-visible::after { opacity: 1; }
 @media (hover: hover) { .player__track:hover::after { opacity: 1; } }
-.player__fill { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--bg); transform-origin: left; transform: scaleX(0); }
+.player__fill { position: absolute; left: 0; right: 0; top: 50%; height: 1px; background: var(--paper); transform-origin: left; transform: scaleX(0); }
 .player__time { color: rgba(242, 244, 247, 0.7); font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .js .img-reveal { clip-path: inset(0 0 100% 0); }
@@ -1099,7 +1152,7 @@ html:not(.js) .frame__c, html:not(.js) .frame__tag { transform: none; opacity: 1
 /* ---------- 15b. TOQUE (celular / tablet) ---------- */
 @media (hover: none), (pointer: coarse) {
   /* backdrop-filter sobre conteúdo rolando engasga em Android; fundo sólido no lugar */
-  .nav__caps { -webkit-backdrop-filter: none; backdrop-filter: none; background: rgba(242, 244, 247, 0.96); }
+  .nav__caps { -webkit-backdrop-filter: none; backdrop-filter: none; background: var(--glass-solid); }
   .nav.is-dark .nav__caps { background: rgba(12, 20, 34, 0.94); }
   /* Alvos de toque maiores no player e no rodapé */
   .player__btn { padding: 12px 4px; }

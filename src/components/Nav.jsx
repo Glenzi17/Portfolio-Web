@@ -6,6 +6,7 @@ import { SITE } from '../data/projects.js';
 import { useShell } from './ShellContext.js';
 import Roll from './Roll.jsx';
 import NavMark from './NavMark.jsx';
+import ThemeToggle from './ThemeToggle.jsx';
 
 const LINKS = [
   { id: 'sobre', n: '01', label: 'Sobre' },
@@ -63,6 +64,7 @@ export default function Nav() {
 
         <div className="nav__caps nav__side">
           {!isHome && <a className="nav__home" href="/" data-transition="Início"><Roll>Início</Roll></a>}
+          <ThemeToggle />
           <a className="btn" {...to('contato', 'Contato')} data-magnetic="0.2"><Roll>Let's talk</Roll> <span className="btn__arrow">→</span></a>
           <button
             className={`nav__toggle${menuOpen ? ' is-open' : ''}`}
