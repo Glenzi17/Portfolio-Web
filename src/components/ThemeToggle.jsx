@@ -8,16 +8,15 @@ import { reduced } from '../lib/motion.js';
    botão (View Transitions API + clip-path no
    ::view-transition-new). O ícone é um disco meio cheio que
    gira meia volta a cada troca. Sem a API, ou com movimento
-   reduzido, a troca é instantânea. A escolha fica salva em
-   localStorage ('gl-theme'); sem escolha, o site abre claro
-   (o script do index.html aplica antes da primeira pintura).
+   reduzido, a troca é instantânea. O site sempre abre claro:
+   a escolha vale só enquanto a página está aberta (navegar
+   entre páginas mantém; recarregar volta ao claro).
    ========================================================= */
 
 const current = () => (document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
 
 const apply = (t) => {
   document.documentElement.dataset.theme = t;
-  try { localStorage.setItem('gl-theme', t); } catch { /* aba privada: vale só nesta visita */ }
   const meta = document.querySelector('meta[name="theme-color"]');
   if (meta) meta.setAttribute('content', t === 'dark' ? '#0a0f18' : '#f2f4f7');
 };

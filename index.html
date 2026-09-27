@@ -13,12 +13,10 @@
 
   <script>
     document.documentElement.classList.add('js');
-    // Tema salvo (ThemeToggle); sem escolha, o site abre claro — aplicado antes de pintar
-    try {
-      var t = localStorage.getItem('gl-theme') === 'dark' ? 'dark' : 'light';
-      document.documentElement.dataset.theme = t;
-      if (t === 'dark') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0a0f18');
-    } catch (e) {}
+    // O site sempre abre claro; o noturno vale só enquanto a página está aberta.
+    // Apaga a escolha antiga que ficava salva (versão anterior do botão).
+    document.documentElement.dataset.theme = 'light';
+    try { localStorage.removeItem('gl-theme'); } catch (e) {}
     // Primeira visita da sessão: o fundo da abertura já sai no HTML, sem esperar o JS
     try {
       if (sessionStorage.getItem('gl-seen') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches)
