@@ -428,7 +428,16 @@ input, textarea { font: inherit; color: inherit; }
   border-radius: var(--radius); background: var(--plate);
 }
 .service--ink { background: var(--ink); color: var(--bg); --mute: rgba(242, 244, 247, 0.6); }
-.service--ocean { color: var(--bg); --mute: rgba(242, 244, 247, 0.8); }
+.service--ocean { color: var(--bg); --mute: rgba(242, 244, 247, 0.88); }
+/* Véu marinho entre o shader e o texto: os trechos claros do líquido (água,
+   brilho mentolado) deixavam o texto branco ilegível, sobretudo no celular.
+   O canvas desce uma camada para o véu ficar entre ele e o conteúdo. */
+.service--ocean .fluid { z-index: -2; }
+.service--ocean::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; border-radius: inherit;
+  background: linear-gradient(180deg, rgba(12, 20, 34, 0.5) 0%, rgba(12, 20, 34, 0.18) 38%, rgba(12, 20, 34, 0.55) 62%, rgba(12, 20, 34, 0.82) 100%);
+}
+.service--ocean h3, .service--ocean p, .service--ocean .label { text-shadow: 0 1px 12px rgba(12, 20, 34, 0.45); }
 .service { position: relative; overflow: hidden; isolation: isolate; }
 /* Painel claro: o azul sobe de baixo no hover */
 .service--plain::before {
