@@ -163,14 +163,7 @@ export const servicesMotion = (scope) => {
       { yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.12 }, 0.35)
     .fromTo(cards.map((c) => c.querySelector('p')), { opacity: 0, y: 12 },
       { opacity: 1, y: 0, duration: 0.8, stagger: 0.12 }, 0.5);
-  // Profundidade: cada painel rola num ritmo levemente diferente (só desktop)
-  if (!window.matchMedia('(min-width: 861px)').matches) return;
-  cards.forEach((c, i) => {
-    gsap.fromTo(c, { y: 0 }, {
-      y: [-10, -34, -18][i % 3], ease: 'none', immediateRender: false,
-      scrollTrigger: { trigger: list, start: 'top 60%', end: 'bottom top', scrub: true },
-    });
-  });
+  // Sem parallax por painel: ritmos diferentes desalinhavam a base dos três
 };
 
 /* ---------- Gráficos dos números (StatCharts.jsx) ---------- */
