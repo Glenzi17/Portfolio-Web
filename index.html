@@ -11,12 +11,25 @@
   <meta property="og:type" content="website">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@500;600&family=Inter:wght@400;500&family=Instrument+Serif:ital@1&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <script>document.documentElement.classList.add('js');</script>
+  <script>
+    document.documentElement.classList.add('js');
+    // Primeira visita da sessão: o fundo da abertura já sai no HTML, sem esperar o JS
+    try {
+      if (sessionStorage.getItem('gl-seen') !== '1' && !matchMedia('(prefers-reduced-motion: reduce)').matches)
+        document.documentElement.classList.add('boot');
+    } catch (e) {}
+  </script>
+  <style>
+    #boot { display: none; }
+    .boot #boot { display: block; position: fixed; inset: 0; z-index: 700; background: #0c1422; }
+    #boot span {
+      position: absolute; right: clamp(20px, 4.5vw, 72px); bottom: 40px;
+      font: 500 11px/1.4 ui-monospace, "SFMono-Regular", Menlo, monospace; letter-spacing: 0.06em; color: rgba(242, 244, 247, 0.6);
+    }
+  </style>
 </head>
 <body>
+  <div id="boot" aria-hidden="true"><span>000</span></div>
   <div id="root"></div>
   <noscript><p style="padding:24px;font-family:system-ui">Este portfólio precisa de JavaScript para funcionar.</p></noscript>
   <script type="module" src="/src/main.jsx"></script>

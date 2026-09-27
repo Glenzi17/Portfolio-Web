@@ -51,6 +51,9 @@ export default function Shell({ children }) {
     return () => document.removeEventListener('keydown', onKey);
   }, []);
 
+  // A abertura estática do index.html sai assim que a do React está na tela
+  useLayoutEffect(() => { document.documentElement.classList.remove('boot'); }, []);
+
   /* ---------- Entrada inicial: preloader ---------- */
   useEffect(() => {
     if (reduced || SEEN) { setReady(true); return undefined; }
@@ -65,23 +68,23 @@ export default function Shell({ children }) {
     gsap.set(glyphs, { yPercent: 110 });
     let tl = null;
     let alive = true;
-    // Espera as fontes (no máx. 1,2 s): antes o "GL" trocava de fonte no meio
-    // da animação e o monograma dava um pulo.
+    // Espera as fontes (no máx. 0,5 s — agora vêm do próprio site): antes o "GL"
+    // trocava de fonte no meio da animação e o monograma dava um pulo.
     const fonts = document.fonts ? document.fonts.ready : Promise.resolve();
-    Promise.race([fonts, new Promise((r) => setTimeout(r, 1200))]).then(() => {
+    Promise.race([fonts, new Promise((r) => setTimeout(r, 500))]).then(() => {
       if (!alive) return;
       // O contorno se desenha junto com a contagem e a barra; as letras sobem
       // pela máscara. Com a tela ainda coberta a página monta (setReady) —
       // o trabalho pesado acontece escondido, e a saída (só transform) fica lisa.
       tl = gsap.timeline({ onComplete: () => { setPreloading(false); if (lenis) lenis.start(); } })
-        .to(n, { v: 100, duration: 1, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(n.v)).padStart(3, '0'); } })
-        .to(ring, { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' }, 0)
-        .to(bar, { scaleX: 1, duration: 1, ease: 'power2.inOut' }, 0)
-        .to(glyphs, { yPercent: 0, duration: 0.8, stagger: 0.08, ease: 'expo.out' }, 0.15)
+        .to(n, { v: 100, duration: 0.8, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(n.v)).padStart(3, '0'); } })
+        .to(ring, { strokeDashoffset: 0, duration: 0.8, ease: 'power2.inOut' }, 0)
+        .to(bar, { scaleX: 1, duration: 0.8, ease: 'power2.inOut' }, 0)
+        .to(glyphs, { yPercent: 0, duration: 0.7, stagger: 0.07, ease: 'expo.out' }, 0.1)
         .add(() => setReady(true))
-        .to(glyphs, { yPercent: -110, duration: 0.45, stagger: 0.05, ease: 'power3.in' }, '+=0.1')
-        .to([mark, count, bar.parentNode], { opacity: 0, duration: 0.35, ease: 'power2.in' }, '<0.05')
-        .to(pre, { yPercent: -112, duration: 1, ease: EASE_IO }, '-=0.1');
+        .to(glyphs, { yPercent: -110, duration: 0.4, stagger: 0.05, ease: 'power3.in' }, '+=0.05')
+        .to([mark, count, bar.parentNode], { opacity: 0, duration: 0.3, ease: 'power2.in' }, '<0.05')
+        .to(pre, { yPercent: -112, duration: 0.85, ease: EASE_IO }, '-=0.1');
     });
     return () => { alive = false; if (tl) tl.kill(); };
   }, []);

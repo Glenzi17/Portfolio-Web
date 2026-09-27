@@ -258,8 +258,3 @@ export default function ProjectRoute() {
   return <Project key={slug} p={PROJECTS[idx]} idx={idx} />;
 }
 
-/* Compatibilidade com a URL antiga: projeto.html?p=slug */
-export function LegacyProjectRedirect() {
-  const slug = new URLSearchParams(window.location.search).get('p');
-  return <Navigate to={slug ? `/projeto/${slug}` : '/'} replace />;
-}

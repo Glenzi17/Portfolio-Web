@@ -24,7 +24,7 @@ export const heroIntro = (scope) => {
   }
 
   // Na primeira visita o preloader ainda está saindo: espera ele liberar o hero
-  const delay = document.querySelector('.preloader') ? 0.55 : 0;
+  const delay = document.querySelector('.preloader') ? 0.4 : 0;
   gsap.timeline({ delay, defaults: { ease: 'expo.out' } })
     .fromTo(meta, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.07 }, 0.2)
     // letra a letra, com um leve giro que assenta

@@ -107,6 +107,10 @@ Easing: `--ease` `cubic-bezier(.16,1,.3,1)` (expo.out) para entradas; `--ease-io
 - Shader líquido: contexto WebGL criado só perto da tela, 30 fps, 0.75× de resolução (0.5× no toque), pausa fora da tela.
 - Sem `will-change` permanente em imagens.
 - Trabalho pesado (montar a página, compilar shader) acontece com o preloader cobrindo a tela.
+- Fontes servidas do próprio site (`@fontsource`, subconjunto latin, importadas em `main.jsx`) — nada de Google Fonts.
+- Página de projeto é um pacote à parte (`lazy` em `App.jsx`), pré-carregado quando o navegador fica ocioso.
+- `index.html` já desenha o fundo da abertura (`.boot #boot`) na primeira visita da sessão; o React o remove ao montar.
+- Cache (`vercel.json`): `/static/*` imutável por 1 ano (nomes com hash); `/assets/*` 1 semana + revalidação.
 - `prefers-reduced-motion`: tudo aparece parado, preloader/cortina/progresso somem.
 
 ## 6. Voz
