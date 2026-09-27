@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import Roll from './Roll.jsx';
 import { SITE } from '../data/projects.js';
 import { magnetize } from '../lib/reveals.js';
+import { smoothCaret } from '../lib/smoothCaret.js';
 
 /* Formulário de contato. Com SITE.formEndpoint (Formspree etc.) envia por
    fetch; sem endpoint, abre o cliente de e-mail com a mensagem preenchida. */
@@ -10,6 +11,7 @@ export default function ContactForm() {
   const [status, setStatus] = useState('');
 
   useEffect(() => magnetize(formRef.current), []);
+  useEffect(() => smoothCaret(formRef.current), []); // cursor que desliza (estilo skiper106)
 
   const onSubmit = async (e) => {
     e.preventDefault();
