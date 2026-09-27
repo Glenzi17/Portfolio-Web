@@ -12,6 +12,7 @@ import os
 import re
 import struct
 import sys
+sys.stdout.reconfigure(encoding="utf-8")  # o console do Windows (cp1252) quebrava no "→"
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PUBLIC = os.path.join(ROOT, 'public')

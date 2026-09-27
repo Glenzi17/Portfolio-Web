@@ -1,6 +1,7 @@
 /* GERADO por tools/media.py — não editar à mão.
    [largura, altura, larguras das variantes responsivas (nome@W.webp)] de cada peça. */
 export const MEDIA = {
+  '/assets/img/portrait.webp': [1086, 1448, [640]],
   '/assets/img/projects/aerion/outdoor-01.webp': [2800, 933, [640, 1000, 1400]],
   '/assets/img/projects/aerion/outdoor-02.webp': [2800, 933, [640, 1000, 1400]],
   '/assets/img/projects/americans/tabloide-01.webp': [1350, 1800, [640, 1000]],
@@ -12,6 +13,7 @@ export const MEDIA = {
   '/assets/img/projects/boulevard/final.webp': [1440, 1800, [640, 1000]],
   '/assets/img/projects/coca-cola/cartaz.webp': [1600, 2261, [640, 1000, 1400]],
   '/assets/img/projects/coca-cola/kv.webp': [1800, 1012, [640, 1000, 1400]],
+  '/assets/img/projects/coca-cola/mobile-como-participar.webp': [1012, 1800, [640]],
   '/assets/img/projects/coca-cola/reel-poster.webp': [1012, 1800, [640]],
   '/assets/img/projects/coca-cola/reel-still.webp': [1012, 1800, [640]],
   '/assets/img/projects/coca-cola/reel.mp4': [1080, 1920, [720]],
@@ -22,6 +24,8 @@ export const MEDIA = {
   '/assets/img/projects/elma-chips/feed.webp': [1080, 1350, [640]],
   '/assets/img/projects/elma-chips/flyer.webp': [1000, 1418, [640]],
   '/assets/img/projects/elma-chips/kv.webp': [1400, 1750, [640, 1000]],
+  '/assets/img/projects/elma-chips/landing-full.webp': [1440, 6376, [640, 1000]],
+  '/assets/img/projects/elma-chips/landing-mobile.webp': [780, 11790, [640]],
   '/assets/img/projects/elma-chips/landing.webp': [1178, 1800, [640, 1000]],
   '/assets/img/projects/elma-chips/outdoor.webp': [1800, 600, [640, 1000, 1400]],
   '/assets/img/projects/elma-chips/story.webp': [1012, 1800, [640]],

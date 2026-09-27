@@ -33,9 +33,6 @@ export default function Player({ src, poster, caption, ratio }) {
       const isPlaying = !video.paused && !video.ended;
       setPlaying(isPlaying);
       setMuted(video.muted);
-      video.dataset.cursor = isPlaying ? 'Pause' : 'Play';
-      // Atualiza o rótulo do cursor customizado se ele estiver sobre o vídeo
-      if (video.matches(':hover')) video.dispatchEvent(new MouseEvent('mouseover', { bubbles: true }));
     };
     const onMeta = () => { time.textContent = `00:00 / ${fmt(video.duration)}`; };
     const onTime = () => {
@@ -121,7 +118,6 @@ export default function Player({ src, poster, caption, ratio }) {
         loop
         playsInline
         preload="metadata"
-        data-cursor="Play"
         aria-label={caption || 'Vídeo do projeto'}
         onClick={toggle}
       />

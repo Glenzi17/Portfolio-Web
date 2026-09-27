@@ -43,7 +43,7 @@ void main(){
   vec2 w = vec2(fbm(p + 2.2 * q + vec2(1.7, 9.2) + T * 1.3 + m * .25),
                 fbm(p + 2.2 * q + vec2(8.3, 2.8) - T * 1.1));
   float f = fbm(p + 1.8 * w);
-  float x = clamp((f - .34) * 2.5 + (w.x - .5) * .6, 0., 1.);
+  float x = clamp((f - .29) * 2.5 + (w.x - .5) * .6, 0., 1.);
   vec3 col = ramp(x);
   // veios de luz (as dobras brilhantes do tecido)
   float ridge = 1. - smoothstep(0., .02, abs(f - .58));
@@ -66,70 +66,89 @@ export default function Fluid({ seed = 0 }) {
 
   useEffect(() => {
     const canvas = ref.current;
-    const gl = canvas && canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
-    if (!gl) { canvas && canvas.remove(); return undefined; }
-
-    const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; };
-    const prog = gl.createProgram();
-    gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
-    gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
-    gl.linkProgram(prog);
-    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.remove(); return undefined; }
-    gl.useProgram(prog);
-    gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
-    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW); // triângulo que cobre a tela
-    const loc = gl.getAttribLocation(prog, 'a');
-    gl.enableVertexAttribArray(loc);
-    gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
-    const u = (k) => gl.getUniformLocation(prog, k);
-    const uR = u('r'), uT = u('t'), uM = u('m'), uS = u('s'), uPx = u('px');
-    gl.uniform1f(uS, seed);
-
-    // Resolução contida: a textura é granulada de propósito, e isso poupa GPU
-    const scale = touch ? 0.5 : Math.min(window.devicePixelRatio || 1, 1.25);
-    const resize = () => {
-      const w = Math.max(1, Math.round(canvas.clientWidth * scale));
-      const hgt = Math.max(1, Math.round(canvas.clientHeight * scale));
-      if (canvas.width !== w || canvas.height !== hgt) { canvas.width = w; canvas.height = hgt; gl.viewport(0, 0, w, hgt); }
-      gl.uniform2f(uR, w, hgt);
-      gl.uniform1f(uPx, scale);
-    };
-
-    const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
-    const onMove = (e) => {
-      const b = canvas.getBoundingClientRect();
-      mouse.tx = ((e.clientX - b.left) / b.width - 0.5) * 2;
-      mouse.ty = -((e.clientY - b.top) / b.height - 0.5) * 2;
-    };
-
-    let raf = 0, visible = false, t0 = performance.now();
-    const draw = (now) => {
-      mouse.x += (mouse.tx - mouse.x) * 0.04; mouse.y += (mouse.ty - mouse.y) * 0.04;
-      gl.uniform1f(uT, (now - t0) / 1000 + seed * 10);
-      gl.uniform2f(uM, mouse.x, mouse.y);
-      gl.drawArrays(gl.TRIANGLES, 0, 3);
-    };
-    const loop = (now) => { draw(now); if (visible) raf = requestAnimationFrame(loop); };
-
-    resize();
-    draw(t0);
-    if (reduced) return undefined; // um quadro estático
-
-    const ro = new ResizeObserver(() => { resize(); if (!visible) draw(performance.now()); });
-    ro.observe(canvas);
-    const io = new IntersectionObserver(([e]) => {
-      visible = e.isIntersecting;
-      cancelAnimationFrame(raf);
-      if (visible) raf = requestAnimationFrame(loop);
-    });
-    io.observe(canvas);
-    if (!touch) window.addEventListener('mousemove', onMove, { passive: true });
-    return () => {
-      cancelAnimationFrame(raf); ro.disconnect(); io.disconnect();
-      window.removeEventListener('mousemove', onMove);
-      const ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext();
-    };
+    if (!canvas) return undefined;
+    // O contexto GL e a compilação do shader só acontecem quando o bloco
+    // chega perto da tela — compilar tudo no load travava a entrada do site.
+    let stop = () => {};
+    const gate = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) return;
+      gate.disconnect();
+      stop = start(canvas, seed) || (() => {});
+    }, { rootMargin: '300px 0px' });
+    gate.observe(canvas);
+    return () => { gate.disconnect(); stop(); };
   }, [seed]);
 
   return <canvas className="fluid" ref={ref} aria-hidden="true" />;
+}
+
+function start(canvas, seed) {
+  const gl = canvas.getContext('webgl', { antialias: false, alpha: false, powerPreference: 'low-power' });
+  if (!gl) { canvas.remove(); return undefined; }
+
+  const sh = (type, src) => { const o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; };
+  const prog = gl.createProgram();
+  gl.attachShader(prog, sh(gl.VERTEX_SHADER, VERT));
+  gl.attachShader(prog, sh(gl.FRAGMENT_SHADER, FRAG));
+  gl.linkProgram(prog);
+  if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) { canvas.remove(); return undefined; }
+  gl.useProgram(prog);
+  gl.bindBuffer(gl.ARRAY_BUFFER, gl.createBuffer());
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW); // triângulo que cobre a tela
+  const loc = gl.getAttribLocation(prog, 'a');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+  const u = (k) => gl.getUniformLocation(prog, k);
+  const uR = u('r'), uT = u('t'), uM = u('m'), uS = u('s'), uPx = u('px');
+  gl.uniform1f(uS, seed);
+
+  // Resolução contida: a textura é granulada de propósito, e isso poupa GPU
+  const scale = touch ? 0.5 : 0.75;
+  const resize = () => {
+    const w = Math.max(1, Math.round(canvas.clientWidth * scale));
+    const hgt = Math.max(1, Math.round(canvas.clientHeight * scale));
+    if (canvas.width !== w || canvas.height !== hgt) { canvas.width = w; canvas.height = hgt; gl.viewport(0, 0, w, hgt); }
+    gl.uniform2f(uR, w, hgt);
+    gl.uniform1f(uPx, scale);
+  };
+
+  const mouse = { x: 0, y: 0, tx: 0, ty: 0 };
+  const onMove = (e) => {
+    const b = canvas.getBoundingClientRect();
+    mouse.tx = ((e.clientX - b.left) / b.width - 0.5) * 2;
+    mouse.ty = -((e.clientY - b.top) / b.height - 0.5) * 2;
+  };
+
+  let raf = 0, visible = false, t0 = performance.now();
+  const draw = (now) => {
+    mouse.x += (mouse.tx - mouse.x) * 0.04; mouse.y += (mouse.ty - mouse.y) * 0.04;
+    gl.uniform1f(uT, (now - t0) / 1000 + seed * 10);
+    gl.uniform2f(uM, mouse.x, mouse.y);
+    gl.drawArrays(gl.TRIANGLES, 0, 3);
+  };
+  // O líquido anda devagar: 30 quadros por segundo bastam e cortam o custo pela metade
+  let last = 0;
+  const loop = (now) => {
+    if (now - last > 32) { last = now; draw(now); }
+    if (visible) raf = requestAnimationFrame(loop);
+  };
+
+  resize();
+  draw(t0);
+  if (reduced) return undefined; // um quadro estático
+
+  const ro = new ResizeObserver(() => { resize(); if (!visible) draw(performance.now()); });
+  ro.observe(canvas);
+  const io = new IntersectionObserver(([e]) => {
+    visible = e.isIntersecting;
+    cancelAnimationFrame(raf);
+    if (visible) raf = requestAnimationFrame(loop);
+  });
+  io.observe(canvas);
+  if (!touch) window.addEventListener('mousemove', onMove, { passive: true });
+  return () => {
+    cancelAnimationFrame(raf); ro.disconnect(); io.disconnect();
+    window.removeEventListener('mousemove', onMove);
+    const ext = gl.getExtension('WEBGL_lose_context'); if (ext) ext.loseContext();
+  };
 }

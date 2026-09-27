@@ -26,6 +26,10 @@
      { type: 'split',   images: [a, b] }         duas pranchas lado a lado
      { type: 'overlap', images: [a, b] }         imagens sobrepostas, sem prancha
      { type: 'detail',  image, zoom, focus }     detalhe ampliado (único bloco que corta)
+     { type: 'devices', label, url, caption,     a mesma peça em Desktop e Mobile, com
+       desktop: img, mobile: img }               botão para o visitante escolher; img
+                                                 pode ter spec ('1440 px'); peça mais
+                                                 alta que a tela rola dentro do aparelho
      { type: 'video',   src, poster, caption }   player próprio: toca mudo ao
                                                  entrar na tela, com som,
                                                  progresso e tela cheia
@@ -35,16 +39,16 @@
 export const SITE = {
   name: 'Guilherme Lenzi',
   // Foto para a seção "Sobre" (ex.: '/assets/img/portrait.webp'). null = monograma.
-  portrait: null,
+  portrait: '/assets/img/portrait.webp',
   role: 'Designer gráfico & Diretor criativo',
   email: 'guilhermelenzi.design@gmail.com',
-  phone: '(35) 9153-3663',
-  phoneHref: 'tel:+553591533663',
+  phone: '(35) 99153-3663',
+  phoneHref: 'tel:+5535991533663',
   location: 'Minas Gerais, Brasil',
   social: {
-    instagram: 'https://instagram.com/',
-    behance: 'https://behance.net/',
-    linkedin: 'https://linkedin.com/',
+    instagram: 'https://www.instagram.com/lenzi_gc/',
+    behance: 'https://www.behance.net/guilhercostal',
+    linkedin: 'https://www.linkedin.com/in/guilherme-costa-lenzi-ab9b3643a/',
   },
   // Endpoint de formulário (ex.: Formspree "https://formspree.io/f/xxxx").
   // Vazio = o botão abre o cliente de e-mail com a mensagem preenchida.
@@ -110,7 +114,14 @@ export const PROJECTS = [
         text:
           'Um sistema que se reconhece de longe e funciona de perto. A landing page fecha o ciclo: a criança vê o estouro no ponto de venda, o adulto escaneia o QR e cadastra a compra em menos de um minuto.',
         blocks: [
-          { type: 'full', image: { src: '/assets/img/projects/elma-chips/landing.webp', alt: 'Landing page da promoção', caption: 'Landing page — cadastro de compra e regulamento.' } },
+          {
+            type: 'devices',
+            label: 'Landing page',
+            url: 'estouraasorte.elmachips.com.br',
+            desktop: { src: '/assets/img/projects/elma-chips/landing-full.webp', alt: 'Landing page da promoção — versão desktop', spec: 'Desktop 1440 px · página inteira' },
+            mobile: { src: '/assets/img/projects/elma-chips/landing-mobile.webp', alt: 'Landing page da promoção — versão mobile', spec: 'Mobile 390 px · página inteira' },
+            caption: 'Landing page — cadastro de compra, prêmios, sorteios e regulamento. No celular: passos em lista, FAQ em acordeão e o cadastro sempre a um toque.',
+          },
           { type: 'wide', image: { src: '/assets/img/projects/elma-chips/faixa.webp', alt: 'Faixa de gôndola', caption: 'Faixa de gôndola 1000 × 120 mm.' } },
         ],
       },
@@ -136,7 +147,14 @@ export const PROJECTS = [
         text:
           'Bares e lanchonetes são ambientes visualmente ruidosos, com luz quente e dezenas de estímulos concorrentes. A promoção precisava ser entendida em dois segundos, a quatro metros de distância, sem depender de leitura de texto pequeno.',
         blocks: [
-          { type: 'wide', image: { src: '/assets/img/projects/coca-cola/kv.webp', alt: 'Key visual horizontal Promoção Clássicos', caption: 'Key visual horizontal — base para telas e mídia digital.' } },
+          {
+            type: 'devices',
+            label: 'Key visual',
+            url: 'coca-cola.com.br/classicos',
+            desktop: { src: '/assets/img/projects/coca-cola/kv.webp', alt: 'Key visual horizontal Promoção Clássicos', spec: 'Horizontal 16:9' },
+            mobile: { src: '/assets/img/projects/coca-cola/mobile-como-participar.webp', alt: 'Tela vertical para celular com a mecânica da promoção', spec: 'Vertical 9:16 · stories e reels' },
+            caption: 'Key visual horizontal para telas e mídia digital; no celular, a mecânica vira uma tela vertical — como participar em três passos.',
+          },
         ],
       },
       {
@@ -166,7 +184,7 @@ export const PROJECTS = [
         text:
           'Uma peça que se lê antes de ser vista. Teste de PDV simulado: com luz quente e ruído visual, a única coisa que precisa vencer é o número. Vence.',
         blocks: [
-          { type: 'detail', image: { src: '/assets/img/projects/coca-cola/cartaz.webp', alt: 'Detalhe do cartaz', caption: 'Detalhe ampliado — tipografia condensada e números em contorno.' }, zoom: 1.08, focus: '50% 10%' },
+          { type: 'detail', image: { src: '/assets/img/projects/coca-cola/cartaz.webp', alt: 'Detalhe do cartaz', caption: 'Detalhe ampliado — tipografia condensada e números em contorno.' }, zoom: 1, focus: '50% 18%', ratio: '4/3' },
         ],
       },
     ],
@@ -313,7 +331,7 @@ export const PROJECTS = [
         text:
           'Cards com selo de categoria (genérico, oferta, promoção), preço "de/por", parcelamento e rodapé com formas de pagamento e serviços da loja. A segunda página muda o tema para "cuidado diário" e fecha com o cupom e o convite para a loja.',
         blocks: [
-          { type: 'detail', image: { src: '/assets/img/projects/americans/tabloide-01.webp', alt: 'Detalhe da grade de ofertas', caption: 'Detalhe — os cards de oferta: selo, produto, preço e condição.' }, zoom: 1.55, focus: '50% 60%' },
+          { type: 'detail', image: { src: '/assets/img/projects/americans/tabloide-01.webp', alt: 'Detalhe da grade de ofertas', caption: 'Detalhe — os cards de oferta: selo, produto, preço e condição.' }, zoom: 1.15, focus: '50% 58%', ratio: '4/3' },
         ],
       },
       {

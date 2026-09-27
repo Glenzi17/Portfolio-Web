@@ -3,12 +3,12 @@
    projetos, timeline de experiência, nav ativa, contato.
    Rodam dentro do gsap.context da página (usePageMotion).
    ========================================================= */
-import { gsap, ScrollTrigger, reduced, touch } from '../lib/motion.js';
+import { gsap, ScrollTrigger, reduced } from '../lib/motion.js';
 
 /* ---------- Hero: entrada cinematográfica ---------- */
 export const heroIntro = (scope) => {
   const meta = scope.querySelectorAll('[data-hero="meta"]');
-  const nameLines = scope.querySelectorAll('[data-hero-line] > span');
+  const nameChars = scope.querySelectorAll('[data-hero-line] .c');
   const titleLines = scope.querySelectorAll('[data-hero-title] > span');
   const desc = scope.querySelector('[data-hero="desc"]');
   const tags = scope.querySelectorAll('[data-hero="tag"]');
@@ -18,18 +18,19 @@ export const heroIntro = (scope) => {
 
   if (reduced) {
     gsap.set([meta, desc, tags, scroll], { opacity: 1 });
-    gsap.set([nameLines, titleLines], { yPercent: 0, y: 0 });
+    gsap.set([nameChars, titleLines], { yPercent: 0, y: 0 });
     if (bottom) bottom.classList.add('is-in');
     return;
   }
 
-  gsap.timeline({ defaults: { ease: 'expo.out' } })
+  // Na primeira visita o preloader ainda está saindo: espera ele liberar o hero
+  const delay = document.querySelector('.preloader') ? 0.55 : 0;
+  gsap.timeline({ delay, defaults: { ease: 'expo.out' } })
     .fromTo(meta, { opacity: 0, y: -12 }, { opacity: 1, y: 0, duration: 0.8, stagger: 0.07 }, 0.2)
-    .fromTo(nameLines, { yPercent: 125, y: 0 }, { yPercent: 0, y: 0, duration: 1.3, stagger: 0.1 }, 0.35)
-    .fromTo(titleLines, { yPercent: 125, y: 0 }, { yPercent: 0, y: 0, duration: 1.1, stagger: 0.09 }, 0.7)
-    .fromTo(desc,
-      touch ? { opacity: 0, y: 18 } : { opacity: 0, y: 18, filter: 'blur(6px)' },
-      touch ? { opacity: 1, y: 0, duration: 1 } : { opacity: 1, y: 0, filter: 'blur(0px)', duration: 1, clearProps: 'filter' }, 0.9)
+    // letra a letra, com um leve giro que assenta
+    .fromTo(nameChars, { yPercent: 115, rotate: 8, y: 0 }, { yPercent: 0, rotate: 0, y: 0, duration: 1.2, stagger: 0.035 }, 0.3)
+    .fromTo(titleLines, { yPercent: 125, y: 0 }, { yPercent: 0, y: 0, duration: 1.1, stagger: 0.09 }, 0.75)
+    .fromTo(desc, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 1 }, 0.9)
     .add(() => bottom && bottom.classList.add('is-in'), 0.95) // linha do rodapé do hero se desenha
     .fromTo(tags, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.7, stagger: 0.05 }, 1.05)
     .fromTo(scroll, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.7 }, 1.3);
@@ -135,15 +136,119 @@ export const initActiveNav = (scope) => {
 /* ---------- Contato: a folha abre até a largura total ---------- */
 // Entra como um cartão recuado das bordas e se expande enquanto sobe
 // (os cantos de baixo ficam retos porque o rodapé continua a folha).
+// Só transform (escala a partir do topo): o clip-path animado repintava a
+// seção inteira — e o shader atrás dela — a cada quadro de rolagem.
 export const contactEnter = (scope) => {
   const contact = scope.querySelector('.contact');
   if (!contact || reduced) return;
-  gsap.fromTo(contact,
-    { clipPath: 'inset(0% 4% 0% 4% round 40px 40px 0px 0px)' },
-    {
-      clipPath: 'inset(0% 0% 0% 0% round 24px 24px 0px 0px)', ease: 'none',
-      scrollTrigger: { trigger: contact, start: 'top bottom', end: 'top 25%', scrub: true },
+  // Entra como um cartão de cantos bem arredondados nos quatro lados; ao
+  // chegar à largura total os cantos de baixo fecham para emendar no rodapé.
+  const end = getComputedStyle(contact).borderRadius || '24px 24px 0px 0px';
+  gsap.fromTo(contact, { scale: 0.9, borderRadius: '56px' }, {
+    scale: 1, borderRadius: end, ease: 'none', clearProps: 'transform,borderRadius',
+    scrollTrigger: { trigger: contact, start: 'top bottom', end: 'top 20%', scrub: true },
+  });
+};
+
+/* ---------- "O que eu faço": painéis entram em leque e flutuam no scroll ---------- */
+export const servicesMotion = (scope) => {
+  const cards = [...scope.querySelectorAll('.service')];
+  if (!cards.length) return;
+  if (reduced) { gsap.set(cards, { opacity: 1 }); return; }
+  const list = cards[0].parentElement;
+  gsap.timeline({ scrollTrigger: { trigger: list, start: 'top 85%', once: true } })
+    .fromTo(cards, { y: 90, opacity: 0, rotate: (i) => (i - 1) * 3, scale: 0.94 },
+      { y: 0, opacity: 1, rotate: 0, scale: 1, duration: 1.2, stagger: 0.12, clearProps: 'transform' })
+    .fromTo(cards.map((c) => c.querySelector('.service__title')), { yPercent: 60, opacity: 0 },
+      { yPercent: 0, opacity: 1, duration: 0.9, stagger: 0.12 }, 0.35)
+    .fromTo(cards.map((c) => c.querySelector('p')), { opacity: 0, y: 12 },
+      { opacity: 1, y: 0, duration: 0.8, stagger: 0.12 }, 0.5);
+  // Profundidade: cada painel rola num ritmo levemente diferente (só desktop)
+  if (!window.matchMedia('(min-width: 861px)').matches) return;
+  cards.forEach((c, i) => {
+    gsap.fromTo(c, { y: 0 }, {
+      y: [-10, -34, -18][i % 3], ease: 'none', immediateRender: false,
+      scrollTrigger: { trigger: list, start: 'top 60%', end: 'bottom top', scrub: true },
     });
+  });
+};
+
+/* ---------- Gráficos dos números (StatCharts.jsx) ---------- */
+export const statCharts = (scope) => {
+  if (reduced) return;
+  const once = (el) => ({ trigger: el, start: 'top 88%', once: true });
+  const units = scope.querySelector('[data-chart="units"]');
+  if (units) {
+    gsap.fromTo(units.querySelectorAll('.unit'), { scale: 0, rotate: -45 },
+      { scale: 1, rotate: 0, duration: 0.7, ease: 'back.out(2)', stagger: 0.07, clearProps: 'transform', scrollTrigger: once(units) });
+  }
+  const years = scope.querySelector('[data-chart="years"]');
+  if (years) {
+    gsap.timeline({ scrollTrigger: once(years) })
+      .fromTo(years.querySelector('.years__fill'), { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 1.6, ease: 'power2.inOut' })
+      .fromTo(years.querySelectorAll('.years__pt'), { opacity: 0, y: 8 },
+        { opacity: 1, y: 0, duration: 0.6, stagger: 0.22, clearProps: 'transform' }, 0.05);
+  }
+  const ring = scope.querySelector('[data-chart="ring"]');
+  if (ring) {
+    const segs = [...ring.querySelectorAll('.ring__seg')];
+    const tl = gsap.timeline({ scrollTrigger: once(ring) })
+      .fromTo(ring.querySelector('svg'), { rotate: -120 }, { rotate: 0, duration: 1.6, ease: 'expo.out', clearProps: 'transform' }, 0)
+      .fromTo(ring.querySelectorAll('.ring__legend li'), { opacity: 0, x: 10 }, { opacity: 1, x: 0, duration: 0.6, stagger: 0.08, clearProps: 'transform' }, 0.4);
+    segs.forEach((seg, i) => {
+      const [len, rest] = seg.getAttribute('stroke-dasharray').split(' ');
+      tl.fromTo(seg, { attr: { 'stroke-dasharray': `0 ${rest}` } }, { attr: { 'stroke-dasharray': `${len} ${rest}` }, duration: 0.8, ease: 'power3.out' }, 0.15 + i * 0.18);
+    });
+  }
+  const bars = scope.querySelector('[data-chart="bars"]');
+  if (bars) {
+    const fills = [...bars.querySelectorAll('.bars__track i')];
+    gsap.fromTo(fills, { scaleX: 0 }, {
+      scaleX: (i, el) => parseFloat(el.style.getPropertyValue('--w')) || 0,
+      duration: 1.3, ease: 'expo.out', stagger: 0.14, clearProps: 'transform', scrollTrigger: once(bars),
+    });
+  }
+};
+
+/* ---------- Legendas que "decodificam" ao entrar ([data-scramble]) ---------- */
+const GLYPHS = '#/_<>+*0123456789ABCDEF';
+export const scramble = (scope) => {
+  if (reduced) return;
+  scope.querySelectorAll('[data-scramble]').forEach((el) => {
+    // só o último nó de texto (o quadradinho <i> do chip fica intacto)
+    const node = [...el.childNodes].reverse().find((c) => c.nodeType === 3 && c.textContent.trim());
+    if (!node) return;
+    const final = node.textContent;
+    const st = { p: 0 };
+    gsap.to(st, {
+      p: 1, duration: 0.9, ease: 'none',
+      scrollTrigger: { trigger: el, start: 'top 92%', once: true },
+      onUpdate: () => {
+        const k = Math.floor(st.p * final.length);
+        node.textContent = final.slice(0, k) + [...final.slice(k)].map((ch) => (ch === ' ' ? ' ' : GLYPHS[(Math.random() * GLYPHS.length) | 0])).join('');
+      },
+      onComplete: () => { node.textContent = final; },
+    });
+  });
+};
+
+/* ---------- Retrato: parallax dentro da moldura ---------- */
+export const portrait = (scope) => {
+  const photo = scope.querySelector('.about__photo');
+  if (!photo || reduced) return;
+  gsap.fromTo(photo, { yPercent: -5 }, {
+    yPercent: 5, ease: 'none',
+    scrollTrigger: { trigger: photo.parentElement, start: 'top bottom', end: 'bottom top', scrub: true },
+  });
+  // Selo: repete a abertura do site — o quadrado entra, o contorno azul se
+  // desenha e as letras sobem pela máscara.
+  const badge = scope.querySelector('.badge');
+  if (badge) {
+    gsap.timeline({ scrollTrigger: { trigger: badge, start: 'top 88%', once: true } })
+      .fromTo(badge, { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: 'back.out(1.4)' })
+      .to(badge.querySelector('.badge__ring rect'), { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, 0.1)
+      .fromTo(badge.querySelectorAll('.badge__glyph > span'), { yPercent: 110 }, { yPercent: 0, duration: 0.8, stagger: 0.08 }, 0.3);
+  }
 };
 
 /* ---------- Texto que se preenche palavra a palavra ([data-words]) ---------- */

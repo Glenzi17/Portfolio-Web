@@ -3,15 +3,20 @@
    ========================================================= */
 import { useEffect, useMemo, useRef } from 'react';
 import { SITE, PROJECTS } from '../data/projects.js';
-import { ratioOf, pad2 } from '../lib/media.js';
+import { ratioOf, pad2, srcsetOf } from '../lib/media.js';
 import { usePageMotion } from '../lib/usePageMotion.js';
 import { initReveals, initDarkNav } from '../lib/reveals.js';
-import { heroIntro, revealWork, initTimeline, initActiveNav, contactEnter, wordFill, countUp, marquee } from './home-motion.js';
+import { heroIntro, revealWork, initTimeline, initActiveNav, contactEnter, wordFill, countUp, marquee, scramble, portrait, servicesMotion, statCharts } from './home-motion.js';
 import { useShell } from '../components/ShellContext.js';
 import Plate from '../components/Plate.jsx';
+import Roll from '../components/Roll.jsx';
+import StatCharts from '../components/StatCharts.jsx';
 import ContactForm from '../components/ContactForm.jsx';
 import Footer from '../components/Footer.jsx';
 import Fluid from '../components/Fluid.jsx';
+
+// Letras soltas para a entrada do nome (cada uma sobe pela máscara da linha)
+const Chars = ({ text }) => [...text].map((ch, i) => <span className="c" key={i} aria-hidden="true">{ch}</span>);
 
 const TITLE = 'Guilherme Lenzi — Designer Gráfico & Diretor Criativo';
 const DESC = 'Portfólio de Guilherme Lenzi: identidades visuais, campanhas publicitárias, direção de arte e experiências digitais com conceito, estética e propósito.';
@@ -28,18 +33,23 @@ const EXPERIENCE = [
 const MARQUEE = ['Branding', 'Campanhas', 'Direção de arte', 'Key visual', 'Digital', 'Identidade visual'];
 
 const SERVICES = [
-  { title: 'Identidade visual', tags: 'Branding / Papelaria', tone: 'lime', text: 'Marcas, logotipos e sistemas visuais consistentes, do cartão de visita ao digital.' },
+  { title: 'Identidade visual', tags: 'Branding / Papelaria', tone: 'plain', text: 'Marcas, logotipos e sistemas visuais consistentes, do cartão de visita ao digital.' },
   { title: 'Campanhas', tags: 'Key visual / PDV / Social', tone: 'ink', text: 'Conceito, direção de arte e desdobramento de peças para campanhas publicitárias e promocionais.' },
   { title: 'Digital', tags: 'UI / Web', tone: 'ocean', text: 'Interfaces, sites e peças digitais pensadas para comunicar bem e funcionar em qualquer tela.' },
 ];
 
-// Anos de estrada saem da própria linha do tempo
-const STATS = [
-  { value: pad2(PROJECTS.length), label: 'Projetos selecionados' },
-  { value: `${Number(EXPERIENCE.at(-1).year) - Number(EXPERIENCE[0].year)}+`, label: 'Anos criando' },
-  { value: '360°', label: 'Campanhas integradas' },
-  { value: pad2(SERVICES.length), label: 'Frentes de atuação' },
+const SOCIAL = [
+  { key: 'instagram', label: 'Instagram' },
+  { key: 'behance', label: 'Behance' },
+  { key: 'linkedin', label: 'LinkedIn' },
 ];
+
+// Luz que segue o mouse dentro do painel (CSS usa --mx/--my)
+const spot = (e) => {
+  const r = e.currentTarget.getBoundingClientRect();
+  e.currentTarget.style.setProperty('--mx', `${e.clientX - r.left}px`);
+  e.currentTarget.style.setProperty('--my', `${e.clientY - r.top}px`);
+};
 
 /* ---------- Grid de projetos ----------
    Cada capa mantém a própria proporção; a largura do card vem da orientação
@@ -95,6 +105,10 @@ export default function Home() {
     wordFill(el);
     countUp(el);
     marquee(el);
+    scramble(el);
+    portrait(el);
+    servicesMotion(el);
+    statCharts(el);
     initDarkNav(el);
   });
 
@@ -110,8 +124,8 @@ export default function Home() {
 
           <div className="hero__center">
             <h1 className="display hero__name" aria-label="Guilherme Lenzi">
-              <span className="l" data-hero-line><span>Guilherme</span></span>
-              <span className="l" data-hero-line><span>Lenzi</span></span>
+              <span className="l" data-hero-line><span><Chars text="Guilherme" /></span></span>
+              <span className="l" data-hero-line><span><Chars text="Lenzi" /></span></span>
             </h1>
 
             <div className="hero__row">
@@ -130,14 +144,14 @@ export default function Home() {
               <li data-hero="tag">Art direction</li>
               <li data-hero="tag">Digital experiences</li>
             </ul>
-            <a className="hero__scroll label" href="#sobre" data-hero="scroll">Scroll to explore <i>↓</i></a>
+            <a className="hero__scroll label" href="#sobre" data-hero="scroll"><Roll>Scroll to explore</Roll> <i>↓</i></a>
           </div>
         </section>
 
         {/* ======================= 01 SOBRE ======================= */}
-        <section className="section container" id="sobre">
+        <section className="section container" id="sobre" data-pill="Sobre">
           <div className="section-head" data-reveal data-line>
-            <span className="label label--ink chip" style={{ '--chip': 'var(--lime)' }}><i />01 / Sobre</span>
+            <span className="label label--ink chip" style={{ '--chip': 'var(--blue)' }} data-scramble><i />01 / Sobre</span>
           </div>
 
           <div className="grid about">
@@ -150,11 +164,27 @@ export default function Home() {
             </div>
 
             <div className="about__visual">
+              {/* Foto: SITE.portrait em src/data/projects.js. Sem foto, mostra o monograma. */}
+              {SITE.portrait && (
+                <div className="badge" aria-hidden="true">
+                  <svg className="badge__ring" viewBox="0 0 120 120"><rect x="1" y="1" width="118" height="118" rx="30" pathLength="1" /></svg>
+                  <span className="badge__glyph"><span>G</span><span className="serif">L</span></span>
+                </div>
+              )}
               <figure className={`about__frame img-reveal${SITE.portrait ? '' : ' about__frame--mono fluid-host'}`} id="about-frame">
                 {!SITE.portrait && <Fluid seed={9.1} />}
-                {/* Foto: defina SITE.portrait em src/data/projects.js. Sem foto, mostra o monograma. */}
                 {SITE.portrait
-                  ? <img src={SITE.portrait} alt="Retrato de Guilherme Lenzi" loading="lazy" decoding="async" />
+                  ? (
+                    <>
+                      <div className="about__photo">
+                        <img src={SITE.portrait} srcSet={srcsetOf(SITE.portrait)} sizes="(max-width: 860px) 440px, 40vw" alt="Retrato de Guilherme Lenzi" loading="lazy" decoding="async" />
+                      </div>
+                      <figcaption className="about__cap">
+                        <span className="label"><i />{SITE.name}</span>
+                        <span className="label">{SITE.location}</span>
+                      </figcaption>
+                    </>
+                  )
                   : <div className="about__mono" data-parallax="-0.06" aria-hidden="true">G<span className="serif">L</span></div>}
               </figure>
             </div>
@@ -165,26 +195,22 @@ export default function Home() {
               <span className="label label--ink">O que eu faço</span>
               <span className="label">{pad2(SERVICES.length)} frentes</span>
             </div>
-            <div className="services__list" data-reveal-group>
+            <div className="services__list">
               {SERVICES.map((s, i) => (
-                <article className={`service${s.tone ? ` service--${s.tone}` : ''}${s.tone === 'ocean' ? ' fluid-host' : ''}`} key={s.title}>
+                <article className={`service${s.tone ? ` service--${s.tone}` : ''}${s.tone === 'ocean' ? ' fluid-host' : ''}`} key={s.title} onMouseMove={spot}>
                   {s.tone === 'ocean' && <Fluid seed={4.2} />}
                   <div className="service__top">
                     <span className="label">{s.tags}</span>
                     <span className="label">{pad2(i + 1)}.</span>
                   </div>
                   <div>
-                    <h3>{s.title}</h3>
+                    <h3 className="service__title">{s.title}</h3>
                     <p>{s.text}</p>
                   </div>
                 </article>
               ))}
             </div>
-            <dl className="stats" data-reveal-group>
-              {STATS.map((s) => (
-                <div key={s.label}><dt className="label">{s.label}</dt><dd data-count>{s.value}</dd></div>
-              ))}
-            </dl>
+            <StatCharts projects={PROJECTS} experience={EXPERIENCE} services={SERVICES.length} />
           </div>
 
           <div className="tools">
@@ -200,9 +226,9 @@ export default function Home() {
         </section>
 
         {/* ======================= 02 EXPERIÊNCIA ======================= */}
-        <section className="section container" id="experiencia">
+        <section className="section container" id="experiencia" data-pill="Experiência">
           <div className="section-head" data-reveal data-line>
-            <span className="label label--ink chip" style={{ '--chip': 'var(--accent)' }}><i />02 / Experiência</span>
+            <span className="label label--ink chip" style={{ '--chip': 'var(--blue)' }} data-scramble><i />02 / Experiência</span>
             <span className="label">2021 — hoje</span>
           </div>
 
@@ -240,9 +266,9 @@ export default function Home() {
         </div>
 
         {/* ======================= 03 PROJETOS ======================= */}
-        <section className="section container" id="projetos">
+        <section className="section container" id="projetos" data-pill="Projetos">
           <div className="section-head" data-reveal data-line>
-            <span className="label label--ink chip" style={{ '--chip': 'var(--ocean)' }}><i />03 / Selected work</span>
+            <span className="label label--ink chip" style={{ '--chip': 'var(--blue)' }} data-scramble><i />03 / Selected work</span>
             <span className="label"><span id="work-count">{pad2(PROJECTS.length)}</span> projetos</span>
           </div>
           <h2 className="h2 work__heading">
@@ -260,8 +286,6 @@ export default function Home() {
                   style={{ '--col': col, '--c': p.color }}
                   href={`/projeto/${p.slug}`}
                   data-transition={p.title}
-                  data-cursor="View<br>project"
-                  data-cursor-color={p.color}
                   aria-label={`${p.title} — ${p.category}`}
                 >
                   <div className="work__fig"><Plate img={p.cover} index={n} sizes={sizes} /></div>
@@ -280,11 +304,11 @@ export default function Home() {
         </section>
 
         {/* ======================= 04 CONTATO ======================= */}
-        <section className="section contact fluid-host" id="contato" data-dark>
+        <section className="section contact fluid-host" id="contato" data-dark data-pill="Contato">
           <Fluid seed={1.3} />
           <div className="container">
             <div className="section-head" data-reveal data-line>
-              <span className="label label--ink chip" style={{ '--chip': 'var(--lime)' }}><i />04 / Contato</span>
+              <span className="label label--ink chip" style={{ '--chip': 'var(--blue)' }} data-scramble><i />04 / Contato</span>
             </div>
 
             <h2 className="display contact__title">
@@ -296,8 +320,20 @@ export default function Home() {
               <div className="contact__info">
                 <p className="lead" data-reveal>Estou aberto a novas oportunidades, projetos e colaborações criativas. Se você tem uma ideia, projeto ou oportunidade em mente, entre em contato.</p>
                 <div className="contact__links" data-reveal-group>
-                  <div><span className="label">E-mail</span><br /><a className="contact__big" href={`mailto:${SITE.email}`}>{SITE.email}</a></div>
-                  <div><span className="label">Telefone</span><br /><a className="contact__big" href={SITE.phoneHref}>{SITE.phone}</a></div>
+                  <div><span className="label">E-mail</span><br /><a className="contact__big" href={`mailto:${SITE.email}`}><Roll>{SITE.email}</Roll></a></div>
+                  <div><span className="label">Telefone</span><br /><a className="contact__big" href={SITE.phoneHref}><Roll>{SITE.phone}</Roll></a></div>
+                  <div>
+                    <span className="label">Redes</span>
+                    <ul className="contact__social">
+                      {SOCIAL.map((s) => (
+                        <li key={s.key}>
+                          <a href={SITE.social[s.key]} target="_blank" rel="noopener noreferrer" aria-label={`${s.label} de ${SITE.name} (abre em nova aba)`}>
+                            <Roll>{s.label}</Roll><span className="contact__social-i" aria-hidden="true">↗</span>
+                          </a>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
                 </div>
               </div>
 

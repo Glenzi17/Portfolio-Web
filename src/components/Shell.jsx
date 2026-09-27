@@ -9,7 +9,6 @@ import { useLocation, useNavigate } from 'react-router';
 import { gsap, lenis, reduced, scrollTo, jumpTo, EASE_IO } from '../lib/motion.js';
 import { ShellCtx } from './ShellContext.js';
 import Nav from './Nav.jsx';
-import Cursor from './Cursor.jsx';
 
 // Preloader só na primeira visita da sessão (lido uma única vez, no load)
 const SEEN = (() => {
@@ -57,23 +56,36 @@ export default function Shell({ children }) {
     if (reduced || SEEN) { setReady(true); return undefined; }
     const pre = preRef.current;
     const count = pre.querySelector('.preloader__count');
+    const bar = pre.querySelector('.preloader__bar i');
     const ring = pre.querySelector('.preloader__ring rect');
     const glyphs = pre.querySelectorAll('.preloader__glyph > span');
     const mark = pre.querySelector('.preloader__mark');
     const n = { v: 0 };
     if (lenis) lenis.stop();
-    // Monograma: o contorno se desenha junto com a contagem, as letras sobem
-    // pela máscara; no fim a tela recolhe para cima com a base arredondada.
-    const tl = gsap.timeline({ onComplete: () => { setPreloading(false); if (lenis) lenis.start(); } })
-      .to(n, { v: 100, duration: 1.1, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(n.v)).padStart(2, '0'); } })
-      .to(ring, { strokeDashoffset: 0, duration: 1.1, ease: 'power2.inOut' }, 0)
-      .fromTo(glyphs, { yPercent: 110 }, { yPercent: 0, duration: 0.8, stagger: 0.08, ease: 'expo.out' }, 0.2)
-      .to(glyphs, { yPercent: -110, duration: 0.5, stagger: 0.05, ease: 'power3.in' }, '+=0.15')
-      .to([mark, count], { opacity: 0, scale: 0.94, duration: 0.4, ease: 'power2.in' }, '<0.1')
-      .to(pre, { clipPath: 'inset(0% 0% 100% 0% round 0px 0px 48px 48px)', duration: 0.9, ease: EASE_IO }, '-=0.15')
-      .add(() => setReady(true), '-=0.85'); // o hero começa a subir enquanto a tela recolhe
-    return () => tl.kill();
+    gsap.set(glyphs, { yPercent: 110 });
+    let tl = null;
+    let alive = true;
+    // Espera as fontes (no máx. 1,2 s): antes o "GL" trocava de fonte no meio
+    // da animação e o monograma dava um pulo.
+    const fonts = document.fonts ? document.fonts.ready : Promise.resolve();
+    Promise.race([fonts, new Promise((r) => setTimeout(r, 1200))]).then(() => {
+      if (!alive) return;
+      // O contorno se desenha junto com a contagem e a barra; as letras sobem
+      // pela máscara. Com a tela ainda coberta a página monta (setReady) —
+      // o trabalho pesado acontece escondido, e a saída (só transform) fica lisa.
+      tl = gsap.timeline({ onComplete: () => { setPreloading(false); if (lenis) lenis.start(); } })
+        .to(n, { v: 100, duration: 1, ease: 'power2.inOut', onUpdate: () => { count.textContent = String(Math.round(n.v)).padStart(3, '0'); } })
+        .to(ring, { strokeDashoffset: 0, duration: 1, ease: 'power2.inOut' }, 0)
+        .to(bar, { scaleX: 1, duration: 1, ease: 'power2.inOut' }, 0)
+        .to(glyphs, { yPercent: 0, duration: 0.8, stagger: 0.08, ease: 'expo.out' }, 0.15)
+        .add(() => setReady(true))
+        .to(glyphs, { yPercent: -110, duration: 0.45, stagger: 0.05, ease: 'power3.in' }, '+=0.1')
+        .to([mark, count, bar.parentNode], { opacity: 0, duration: 0.35, ease: 'power2.in' }, '<0.05')
+        .to(pre, { yPercent: -112, duration: 1, ease: EASE_IO }, '-=0.1');
+    });
+    return () => { alive = false; if (tl) tl.kill(); };
   }, []);
+
 
   /* ---------- Troca de rota: scroll + cortina ---------- */
   useLayoutEffect(() => {
@@ -153,7 +165,8 @@ export default function Shell({ children }) {
             <svg className="preloader__ring" viewBox="0 0 120 120"><rect x="1" y="1" width="118" height="118" rx="30" pathLength="1" /></svg>
             <span className="preloader__glyph"><span>G</span><span className="serif">L</span></span>
           </div>
-          <div className="preloader__count label">00</div>
+          <div className="preloader__count label">000</div>
+          <div className="preloader__bar"><i /></div>
         </div>
       )}
       {!reduced && (
@@ -161,7 +174,6 @@ export default function Shell({ children }) {
           <span className="curtain__label label" ref={labelRef} />
         </div>
       )}
-      <Cursor />
 
       <Nav />
 

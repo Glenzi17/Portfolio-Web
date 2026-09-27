@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import Roll from './Roll.jsx';
 import { SITE } from '../data/projects.js';
 import { magnetize } from '../lib/reveals.js';
 
@@ -40,7 +41,7 @@ export default function ContactForm() {
       <div className="field"><input id="f-tel" name="telefone" type="tel" placeholder="Telefone" autoComplete="tel" /><label htmlFor="f-tel">Telefone</label></div>
       <div className="field"><textarea id="f-msg" name="mensagem" placeholder="Mensagem" rows={4} required /><label htmlFor="f-msg">Mensagem</label></div>
       <div className="form__foot">
-        <button className="btn btn--lg" type="submit" data-magnetic>Enviar <span className="btn__arrow">→</span></button>
+        <button className="btn btn--lg" type="submit" data-magnetic><Roll>Enviar</Roll> <span className="btn__arrow">→</span></button>
         <span className="form__status small" id="form-status" aria-live="polite">{status}</span>
       </div>
     </form>

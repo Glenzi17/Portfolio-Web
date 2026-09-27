@@ -27,13 +27,14 @@ export const initReveals = (scope) => {
     });
   });
 
-  // Fade up + blur → sharp (sem blur no toque: filtro animado pesa na GPU do celular)
+  // Fade up. Sem blur: filtro animado repinta o bloco a cada quadro e era
+  // uma das causas do engasgo na rolagem.
   scope.querySelectorAll('[data-reveal]').forEach((el) => {
     const dir = el.dataset.reveal || 'up';
-    const from = { opacity: 0, y: dir === 'up' ? 28 : dir === 'down' ? -20 : 0 };
-    const to = { opacity: 1, y: 0, duration: 1.1, scrollTrigger: { trigger: el, start: startFor(el, 90), once: true } };
-    if (!touch) { from.filter = 'blur(6px)'; to.filter = 'blur(0px)'; to.clearProps = 'filter'; }
-    gsap.fromTo(el, from, to);
+    gsap.fromTo(el, { opacity: 0, y: dir === 'up' ? 28 : dir === 'down' ? -20 : 0 }, {
+      opacity: 1, y: 0, duration: 1.1, clearProps: 'transform',
+      scrollTrigger: { trigger: el, start: startFor(el, 90), once: true },
+    });
   });
 
   // Grupo com stagger
